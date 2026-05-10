@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    {"id": "war", "label": "War / Conflict", "description": "Armed conflict, political instability", "indicators": ["ACLED events", "battle deaths"]},
+    {"id": "energy", "label": "Energy", "description": "Oil, gas, electricity supply + pricing", "indicators": ["Brent crude", "natural gas", "diesel"]},
+    {"id": "transport", "label": "Transport", "description": "Shipping, land logistics, supply chain", "indicators": ["Baltic Dry Index", "freight rates"]},
+    {"id": "fertilizer", "label": "Fertilizer", "description": "Chemical fertilizer production + trade", "indicators": ["Urea", "DAP", "MOP prices"]},
+    {"id": "crop", "label": "Crop Yield", "description": "Crop production, harvest outcomes", "indicators": ["NDVI", "FAO crop forecasts"]},
+    {"id": "food", "label": "Food Prices", "description": "Consumer food prices, market access", "indicators": ["WFP food prices", "local staples"]},
+    {"id": "economy", "label": "Economy", "description": "GDP, trade, currency, inflation", "indicators": ["World Bank GDP", "CPI", "FX rates"]},
+    {"id": "jobs", "label": "Employment", "description": "Labor market, livelihoods", "indicators": ["ILO unemployment"]},
+    {"id": "health", "label": "Health", "description": "Disease burden, malnutrition, healthcare", "indicators": ["WHO GHO", "UNICEF malnutrition"]},
+    {"id": "water", "label": "Water / Sanitation", "description": "Clean water access, sanitation", "indicators": ["WHO/UNICEF JMP", "drought indices"]},
+    {"id": "displacement", "label": "Displacement", "description": "Refugees, IDPs, migration", "indicators": ["UNHCR", "IOM tracking"]}
+  ],
+  "edges": [
+    {"id": 1,  "from": "war",          "to": "energy",       "weight": 0.85, "delay_min": 1,   "delay_max": 7,   "delay_mid": 4,   "mechanism": "Conflict disrupts oil/gas production", "source": "IEA WEO"},
+    {"id": 2,  "from": "war",          "to": "displacement", "weight": 0.90, "delay_min": 1,   "delay_max": 30,  "delay_mid": 15,  "mechanism": "Civilians flee conflict zones", "source": "UNHCR"},
+    {"id": 3,  "from": "war",          "to": "transport",    "weight": 0.70, "delay_min": 1,   "delay_max": 14,  "delay_mid": 7,   "mechanism": "Blockades, destroyed infrastructure", "source": "World Bank"},
+    {"id": 4,  "from": "war",          "to": "health",       "weight": 0.60, "delay_min": 7,   "delay_max": 60,  "delay_mid": 30,  "mechanism": "Destroyed healthcare, disease", "source": "WHO EMR"},
+    {"id": 5,  "from": "energy",       "to": "transport",    "weight": 0.80, "delay_min": 3,   "delay_max": 14,  "delay_mid": 8,   "mechanism": "Fuel costs drive freight costs", "source": "IMF WEO"},
+    {"id": 6,  "from": "energy",       "to": "fertilizer",   "weight": 0.85, "delay_min": 7,   "delay_max": 30,  "delay_mid": 18,  "mechanism": "Natural gas is fertilizer input", "source": "FAO"},
+    {"id": 7,  "from": "energy",       "to": "economy",      "weight": 0.65, "delay_min": 14,  "delay_max": 60,  "delay_mid": 37,  "mechanism": "Energy costs drive inflation", "source": "IMF WEO"},
+    {"id": 8,  "from": "transport",    "to": "food",         "weight": 0.70, "delay_min": 7,   "delay_max": 30,  "delay_mid": 18,  "mechanism": "Transport costs raise food prices", "source": "FAO FPI"},
+    {"id": 9,  "from": "fertilizer",   "to": "crop",         "weight": 0.75, "delay_min": 30,  "delay_max": 120, "delay_mid": 75,  "mechanism": "Less fertilizer → lower yields", "source": "IFPRI"},
+    {"id": 10, "from": "crop",         "to": "food",         "weight": 0.80, "delay_min": 14,  "delay_max": 60,  "delay_mid": 37,  "mechanism": "Lower yields → higher food prices", "source": "FAO"},
+    {"id": 11, "from": "food",         "to": "health",       "weight": 0.85, "delay_min": 30,  "delay_max": 90,  "delay_mid": 60,  "mechanism": "Food insecurity → malnutrition", "source": "WFP/UNICEF"},
+    {"id": 12, "from": "food",         "to": "economy",      "weight": 0.55, "delay_min": 14,  "delay_max": 60,  "delay_mid": 37,  "mechanism": "Food spending crowds out sectors", "source": "World Bank"},
+    {"id": 13, "from": "economy",      "to": "jobs",         "weight": 0.70, "delay_min": 30,  "delay_max": 90,  "delay_mid": 60,  "mechanism": "Economic contraction → unemployment", "source": "ILO"},
+    {"id": 14, "from": "jobs",         "to": "health",       "weight": 0.50, "delay_min": 60,  "delay_max": 180, "delay_mid": 120, "mechanism": "Poverty → reduced healthcare", "source": "WHO"},
+    {"id": 15, "from": "jobs",         "to": "displacement", "weight": 0.45, "delay_min": 60,  "delay_max": 180, "delay_mid": 120, "mechanism": "Economic migration", "source": "IOM"},
+    {"id": 16, "from": "displacement", "to": "health",       "weight": 0.75, "delay_min": 7,   "delay_max": 30,  "delay_mid": 18,  "mechanism": "Camp conditions, healthcare loss", "source": "UNHCR/WHO"},
+    {"id": 17, "from": "displacement", "to": "water",        "weight": 0.65, "delay_min": 7,   "delay_max": 30,  "delay_mid": 18,  "mechanism": "Displaced strain water systems", "source": "UNICEF/WHO"},
+    {"id": 18, "from": "water",        "to": "health",       "weight": 0.80, "delay_min": 7,   "delay_max": 60,  "delay_mid": 30,  "mechanism": "Waterborne disease outbreaks", "source": "WHO WASH"}
+  ],
+  "threshold": 0.05,
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-04-29",
+    "description": "CascadeAI dependency graph — 11 nodes, 18 directed weighted edges",
+    "sources": "IEA, UNHCR, World Bank, WHO, IMF, FAO, IFPRI, ILO, IOM, UNICEF"
+  }
+}

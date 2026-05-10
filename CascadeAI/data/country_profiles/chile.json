@@ -1,0 +1,35 @@
+{
+  "country": "chile",
+  "display_name": "Chile",
+  "iso3": "CHL",
+  "region": "South America",
+  "lat": -35.6751,
+  "lon": -71.543,
+  "alert_language": "Spanish",
+  "vulnerability": {
+    "war": 0.1,
+    "energy": 0.4,
+    "transport": 0.35,
+    "fertilizer": 0.3,
+    "crop": 0.4,
+    "food": 0.35,
+    "economy": 0.65,
+    "jobs": 0.7,
+    "health": 0.35,
+    "water": 0.6,
+    "displacement": 0.25
+  },
+  "baseline_indicators": {
+    "lithium_dependency": "25% of global lithium supply (Atacama)",
+    "mining_gdp_share": "Mining = 12% of GDP, 55% of exports",
+    "atacama_communities": "Indigenous Atacameno communities depend on water/land near mines",
+    "water_stress": "Atacama region severe water stress — mining vs agriculture conflict",
+    "copper_lithium_jobs": "300,000+ mining-related jobs"
+  },
+  "primary_staples": ["wheat", "rice", "potatoes"],
+  "ev_supply_chain_exposure": {
+    "lithium_share_global": 0.25,
+    "mining_employment": 300000,
+    "price_sensitivity": "Lithium price drop = mine closures, community job loss in Atacama"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "country": "Egypt",
+  "iso3": "EGY",
+  "region": "North Africa",
+  "population": 106000000,
+  "key_vulnerability": "Largest wheat importer, subsidized bread",
+  "coordinates": {"lat": 30.044, "lon": 31.236},
+  "vulnerability": {
+    "war": 0.3,
+    "energy": 0.6,
+    "transport": 0.75,
+    "fertilizer": 0.7,
+    "crop": 0.65,
+    "food": 0.95,
+    "economy": 0.85,
+    "jobs": 0.8,
+    "health": 0.5,
+    "water": 0.8,
+    "displacement": 0.4
+  },
+  "baseline_indicators": {
+    "wheat_import_dependency_pct": 62,
+    "food_insecure_pct": 8,
+    "wheat_price_usd_kg": 0.35,
+    "bread_price_usd_loaf": 0.05,
+    "fuel_price_usd_liter": 0.42,
+    "under5_malnutrition_pct": 18,
+    "idp_count": 0,
+    "gdp_per_capita_usd": 3920
+  },
+  "primary_staples": ["wheat", "rice", "maize"],
+  "major_import_routes": ["Black Sea → Suez", "EU Atlantic → Mediterranean"],
+  "alert_language": "ar"
+}

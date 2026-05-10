@@ -1,0 +1,34 @@
+{
+  "country": "Ethiopia",
+  "iso3": "ETH",
+  "region": "East Africa",
+  "population": 126000000,
+  "key_vulnerability": "20M food insecure, conflict in Tigray",
+  "coordinates": {"lat": 9.025, "lon": 38.747},
+  "vulnerability": {
+    "war": 0.8,
+    "energy": 0.7,
+    "transport": 0.85,
+    "fertilizer": 0.9,
+    "crop": 0.85,
+    "food": 0.95,
+    "economy": 0.8,
+    "jobs": 0.75,
+    "health": 0.9,
+    "water": 0.9,
+    "displacement": 0.85
+  },
+  "baseline_indicators": {
+    "wheat_import_dependency_pct": 30,
+    "food_insecure_pct": 16,
+    "wheat_price_usd_kg": 0.52,
+    "maize_price_usd_kg": 0.38,
+    "fuel_price_usd_liter": 1.28,
+    "under5_malnutrition_pct": 37,
+    "idp_count": 4200000,
+    "gdp_per_capita_usd": 1020
+  },
+  "primary_staples": ["teff", "maize", "wheat", "sorghum"],
+  "major_import_routes": ["Djibouti port → Addis Ababa corridor"],
+  "alert_language": "am"
+}

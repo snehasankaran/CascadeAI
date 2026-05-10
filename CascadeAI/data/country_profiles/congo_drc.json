@@ -1,0 +1,38 @@
+{
+  "country": "congo_drc",
+  "display_name": "DR Congo",
+  "iso3": "COD",
+  "region": "Central Africa",
+  "lat": -4.0383,
+  "lon": 21.7587,
+  "alert_language": "French",
+  "vulnerability": {
+    "war": 0.95,
+    "energy": 0.9,
+    "transport": 0.95,
+    "fertilizer": 0.85,
+    "crop": 0.85,
+    "food": 0.95,
+    "economy": 0.95,
+    "jobs": 0.95,
+    "health": 0.95,
+    "water": 0.9,
+    "displacement": 0.95
+  },
+  "baseline_indicators": {
+    "cobalt_dependency": "70% of global cobalt supply",
+    "artisanal_miners": "200,000+ artisanal miners in Katanga/Lualaba",
+    "mining_gdp_share": "Mining = 30% of GDP, 95% of exports",
+    "food_insecurity": "26M food insecure (IPC Phase 3+)",
+    "displacement": "6.9M IDPs (largest in Africa)",
+    "child_labor_mining": "40,000+ children in artisanal mines (UNICEF est.)",
+    "healthcare_access": "Only 37% of population has healthcare access"
+  },
+  "primary_staples": ["cassava", "maize", "rice"],
+  "ev_supply_chain_exposure": {
+    "cobalt_share_global": 0.70,
+    "mining_employment": 200000,
+    "artisanal_share": 0.30,
+    "price_sensitivity": "Cobalt price drop = direct income loss for 2M+ dependents"
+  }
+}

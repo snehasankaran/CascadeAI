@@ -1,0 +1,34 @@
+{
+  "country": "India",
+  "iso3": "IND",
+  "region": "South Asia",
+  "population": 1440000000,
+  "key_vulnerability": "190M undernourished, monsoon-dependent",
+  "coordinates": {"lat": 20.594, "lon": 78.963},
+  "vulnerability": {
+    "war": 0.15,
+    "energy": 0.85,
+    "transport": 0.6,
+    "fertilizer": 0.8,
+    "crop": 0.75,
+    "food": 0.7,
+    "economy": 0.6,
+    "jobs": 0.7,
+    "health": 0.65,
+    "water": 0.7,
+    "displacement": 0.3
+  },
+  "baseline_indicators": {
+    "wheat_import_dependency_pct": 3,
+    "food_insecure_pct": 14,
+    "wheat_price_usd_kg": 0.28,
+    "rice_price_usd_kg": 0.35,
+    "fuel_price_usd_liter": 1.35,
+    "under5_malnutrition_pct": 32,
+    "idp_count": 473000,
+    "gdp_per_capita_usd": 2410
+  },
+  "primary_staples": ["rice", "wheat", "pulses"],
+  "major_import_routes": ["Hormuz → West coast ports", "SE Asia → East coast"],
+  "alert_language": "hi"
+}

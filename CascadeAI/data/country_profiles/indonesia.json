@@ -1,0 +1,36 @@
+{
+  "country": "indonesia",
+  "display_name": "Indonesia",
+  "iso3": "IDN",
+  "region": "Southeast Asia",
+  "lat": -0.7893,
+  "lon": 113.9213,
+  "alert_language": "Indonesian",
+  "vulnerability": {
+    "war": 0.2,
+    "energy": 0.6,
+    "transport": 0.65,
+    "fertilizer": 0.7,
+    "crop": 0.7,
+    "food": 0.65,
+    "economy": 0.75,
+    "jobs": 0.8,
+    "health": 0.7,
+    "water": 0.6,
+    "displacement": 0.4
+  },
+  "baseline_indicators": {
+    "nickel_dependency": "50% of global nickel supply",
+    "nickel_processing_boom": "Sulawesi industrial parks — $30B+ invested in nickel smelters for EV batteries",
+    "mining_jobs": "500,000+ in nickel mining/processing",
+    "environmental_impact": "Deforestation and tailings from nickel processing in Sulawesi/Maluku",
+    "food_insecurity": "8% stunting, 20M food insecure in eastern provinces"
+  },
+  "primary_staples": ["rice", "maize", "cassava"],
+  "ev_supply_chain_exposure": {
+    "nickel_share_global": 0.50,
+    "processing_investment": "30B USD",
+    "mining_employment": 500000,
+    "price_sensitivity": "Nickel demand drop = stranded assets, mass layoffs in Sulawesi"
+  }
+}

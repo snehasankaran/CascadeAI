@@ -1,0 +1,34 @@
+{
+  "country": "Bangladesh",
+  "iso3": "BGD",
+  "region": "South Asia",
+  "population": 173000000,
+  "key_vulnerability": "40% in flood zones, rising sea levels",
+  "coordinates": {"lat": 23.685, "lon": 90.356},
+  "vulnerability": {
+    "war": 0.2,
+    "energy": 0.85,
+    "transport": 0.8,
+    "fertilizer": 0.9,
+    "crop": 0.85,
+    "food": 0.9,
+    "economy": 0.8,
+    "jobs": 0.85,
+    "health": 0.8,
+    "water": 0.95,
+    "displacement": 0.7
+  },
+  "baseline_indicators": {
+    "wheat_import_dependency_pct": 65,
+    "food_insecure_pct": 12,
+    "wheat_price_usd_kg": 0.38,
+    "rice_price_usd_kg": 0.42,
+    "fuel_price_usd_liter": 1.15,
+    "under5_malnutrition_pct": 28,
+    "idp_count": 427000,
+    "gdp_per_capita_usd": 2688
+  },
+  "primary_staples": ["rice", "wheat", "lentils"],
+  "major_import_routes": ["Indian Ocean → Chittagong port"],
+  "alert_language": "bn"
+}

@@ -1,0 +1,72 @@
+{
+  "name": "PREDICTION: European Auto Industry Cascade — German Manufacturing Crisis",
+  "status": "ACTIVE — early signals visible",
+  "prediction_date": "2026-05-01",
+  "verification_window": "Q3 2026 — Q4 2027",
+  "confidence": "HIGH",
+
+  "trigger": {
+    "date": "2026-05-01",
+    "description": "VW 35,000 job cuts + Continental/ZF restructuring + 21.4% US export decline cascade into Central/Eastern European supplier economies and Turkish auto parts sector",
+    "node": "economy",
+    "severity": 0.65,
+    "region": "EU — Germany/Czech Republic/Slovakia/Hungary/Turkey"
+  },
+
+  "reasoning": "German OEMs (VW, BMW, Mercedes) are the anchor employers for entire supply chain ecosystems in Central/Eastern Europe and Turkey. VW alone employs 120,000 in Germany and sustains 300,000+ supplier jobs across EU. The 35,000 job cut announcement is the trigger, but CascadeAI predicts the second-order effects: Czech/Slovak/Hungarian factories that supply VW face order cancellations within 90 days. Turkey's auto parts sector (5% of GDP, $35B exports) loses its second-largest customer. These are countries with limited social safety nets compared to Germany.",
+
+  "predictions": [
+    {
+      "id": "P1",
+      "country": "turkey",
+      "node": "economy",
+      "prediction": "Turkish auto parts exports decline 15-25% by Q4 2026 as German OEM orders collapse; $5-8B revenue loss",
+      "mechanism": "German OEM restructuring -> order cancellation to Turkish Tier-2 suppliers -> export revenue loss",
+      "delay_from_trigger": "90-180 days",
+      "data_source_to_verify": "Turkish Statistical Institute (TUIK); OSD (Automotive Manufacturers Association); Turkish export data",
+      "confidence": "HIGH — Turkey's auto sector exports 75% to EU; Germany is largest customer"
+    },
+    {
+      "id": "P2",
+      "country": "turkey",
+      "node": "jobs",
+      "prediction": "50,000-80,000 auto sector job losses in Bursa/Kocaeli industrial zones by Q1 2027",
+      "mechanism": "ECONOMY(export decline) -> JOBS(factory closures/layoffs in auto corridor)",
+      "delay_from_trigger": "120-270 days",
+      "data_source_to_verify": "Turkish Employment Agency (ISKUR); Bursa Chamber of Industry; ILO Turkey",
+      "confidence": "HIGH — auto sector employs 500,000+ directly; 15-25% revenue loss maps to proportional job impact"
+    },
+    {
+      "id": "P3",
+      "country": "turkey",
+      "node": "displacement",
+      "prediction": "Internal migration from Bursa/Kocaeli to Istanbul increases 10-15%; adds pressure to already-strained 4M+ Syrian refugee hosting infrastructure",
+      "mechanism": "JOBS(auto layoffs) -> DISPLACEMENT(economic migration) compounds with existing refugee hosting burden",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "TUIK internal migration data; UNHCR Turkey; Istanbul municipality reports",
+      "confidence": "MEDIUM — migration pattern is established; scale depends on social safety net response"
+    },
+    {
+      "id": "P4",
+      "country": "pakistan",
+      "node": "economy",
+      "prediction": "Pakistani auto parts exports to EU decline 20-30%, affecting 200,000+ workers in Lahore/Karachi industrial estates",
+      "mechanism": "European OEM order cuts cascade to low-cost suppliers; Pakistan's $2B auto parts export sector loses orders",
+      "delay_from_trigger": "120-240 days",
+      "data_source_to_verify": "Pakistan Bureau of Statistics; PAMA (Pakistan Automotive Manufacturers); SBP trade data",
+      "confidence": "MEDIUM — Pakistan is a growing but smaller supplier; impact proportional to EU dependency"
+    },
+    {
+      "id": "P5",
+      "country": "india",
+      "node": "economy",
+      "prediction": "Indian auto component sector benefits from trade diversion — Bharat Forge, Motherson gain $2-4B in redirected orders by Q2 2027 as OEMs shift from China/EU to India (18% tariff deal)",
+      "mechanism": "US-India 18% tariff deal (Feb 2026) makes India competitive vs 25% EU tariff; order redirection",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "ACMA (Auto Component Manufacturers Association); Bharat Forge/Motherson quarterly results",
+      "confidence": "HIGH — tariff arbitrage is clear; Indian suppliers already reporting increased inquiry volumes"
+    }
+  ],
+
+  "key_insight": "CascadeAI shows that a German factory closure doesn't just affect German workers — it cascades into Turkish auto workers in Bursa, Pakistani welders in Lahore, and compounds refugee pressure in Istanbul. The delay is 6-12 months, creating a window for preventive action."
+}

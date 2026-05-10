@@ -1,0 +1,78 @@
+{
+  "name": "PREDICTION: BEV Supply Chain Second Wave — Gigafactory Graveyard",
+  "status": "ACTIVE — developing now",
+  "prediction_date": "2026-05-01",
+  "verification_window": "Q3 2026 — Q2 2027",
+  "confidence": "HIGH",
+
+  "trigger": {
+    "date": "2026-05-01",
+    "description": "BEV demand destruction + $50B+ in battery gigafactory investments becoming stranded assets as OEMs pivot to hybrids. Second-tier suppliers and mining communities face the full delayed impact.",
+    "node": "economy",
+    "severity": 0.70,
+    "region": "Global — US/EU/Southeast Asia"
+  },
+
+  "reasoning": "The first wave (OEM write-downs, Tier-1 layoffs) is confirmed. But the SECOND wave hasn't hit yet. Battery gigafactories built on 2021-2023 demand forecasts are now operating at 20-40% capacity. Second-tier suppliers (smaller than Bosch/Continental) lack cash reserves to survive. Mining communities in Congo experienced initial price shock but the full humanitarian cascade — food insecurity, health collapse, displacement — has a 6-12 month delay from income loss (per CascadeAI's JOBS->HEALTH delay of 60-180 days).",
+
+  "predictions": [
+    {
+      "id": "P1",
+      "country": "congo_drc",
+      "node": "health",
+      "prediction": "Acute malnutrition rates in Lualaba/Haut-Katanga mining districts will exceed emergency threshold (15% GAM) by Q4 2026",
+      "mechanism": "ECONOMY(-40% cobalt) -> JOBS(miners income halved) -> FOOD(+18% maize, confirmed) -> HEALTH(malnutrition, 60-90 day delay from food stress)",
+      "delay_from_trigger": "120-180 days from income loss (Q3 2025 + 6 months = Q1-Q2 2026, emerging now)",
+      "data_source_to_verify": "WFP VAM food security monitoring; UNICEF nutrition surveys; MSF field reports",
+      "confidence": "HIGH — food price increase already confirmed; health impact follows with known delay"
+    },
+    {
+      "id": "P2",
+      "country": "congo_drc",
+      "node": "displacement",
+      "prediction": "50,000-100,000 economic migrants from Katanga mining belt to Lubumbashi/Kinshasa by end of 2026",
+      "mechanism": "JOBS(mining collapse) -> DISPLACEMENT(economic migration, 60-180 day delay)",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "IOM displacement tracking; UNHCR; DRC census bureau",
+      "confidence": "MEDIUM-HIGH — initial migration already reported by IOM; scale prediction requires monitoring"
+    },
+    {
+      "id": "P3",
+      "country": "indonesia",
+      "node": "economy",
+      "prediction": "$15-25B in stranded nickel processing assets in Sulawesi by Q1 2027 as Chinese HPAL/smelter projects are abandoned",
+      "mechanism": "US 145% tariff on Chinese batteries -> Chinese nickel processors lose primary market -> Sulawesi industrial parks become stranded",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "Bloomberg; Indonesian Ministry of Industry reports; Sulawesi industrial park utilization data",
+      "confidence": "HIGH — $8B already at risk (confirmed); additional projects in pipeline will follow"
+    },
+    {
+      "id": "P4",
+      "country": "indonesia",
+      "node": "health",
+      "prediction": "Environmental health crisis in Sulawesi as abandoned smelters leak heavy metals into water systems; respiratory illness +20-30% in Morowali district",
+      "mechanism": "ECONOMY(stranded assets) -> JOBS(workers leave) -> WATER(unmonitored tailings) -> HEALTH(contamination)",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "Indonesian EPA monitoring; Greenpeace Indonesia; WHO water quality data",
+      "confidence": "MEDIUM — environmental monitoring already reduced at 4 sites (confirmed); contamination pathway is established"
+    },
+    {
+      "id": "P5",
+      "country": "chile",
+      "node": "water",
+      "prediction": "Water conflict intensifies in Atacama as shuttered lithium operations leave brine extraction sites unmanaged, threatening indigenous Atacameno water access",
+      "mechanism": "ECONOMY(lithium price collapse) -> JOBS(mine closures) -> WATER(abandoned brine extraction alters water table)",
+      "delay_from_trigger": "180-365 days",
+      "data_source_to_verify": "Chilean water authority (DGA); Atacameno community statements; SQM/Albemarle environmental reports",
+      "confidence": "MEDIUM — water stress already severe in Atacama; mine closure procedures unclear"
+    }
+  ],
+
+  "compound_prediction": {
+    "id": "P6",
+    "description": "COMPOUND: BEV Second Wave + Sudan War create overlapping displacement",
+    "prediction": "Congolese miners displaced by cobalt crash overlap with Sudanese refugees in eastern DRC, compounding existing 6.9M IDP crisis. Total DRC displacement exceeds 8M by Q1 2027.",
+    "mechanism": "BEV ECONOMY->JOBS->DISPLACEMENT converges with SUDAN WAR->DISPLACEMENT in same geographic region",
+    "confidence": "MEDIUM — both cascades are active; convergence geography is plausible"
+  }
+}
