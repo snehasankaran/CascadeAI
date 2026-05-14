@@ -1,13 +1,19 @@
 """Full pipeline test — Event Detection + BFS Cascade + Impact Prediction
-+ Narrative Generation, all powered by Gemma 4 31B."""
++ Narrative Generation, all powered by Gemma 4 31B.
+
+Reads credentials from CascadeAI/.env (loaded by config.py). Skips itself
+if GEMMA_API_KEY is unset or set to the local-Ollama placeholder.
+"""
 
 import sys, os, json
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-os.environ["GEMMA_API_BASE"] = "https://generativelanguage.googleapis.com/v1beta"
-os.environ["GEMMA_API_KEY"] = "AIzaSyBGxomsSzlRzTFa123XjLqVvQHutBrjSc0"
-os.environ["GEMMA_MODEL"] = "gemma-4-31b-it"
+import config  # noqa: F401 — loads .env
+
+if not os.getenv("GEMMA_API_KEY") or os.getenv("GEMMA_API_KEY") == "ollama":
+    print("SKIP: set GEMMA_API_KEY in CascadeAI/.env to run this live test.")
+    sys.exit(0)
 
 from models.gemma_client import GemmaClient
 from cascade.graph import CascadeGraph

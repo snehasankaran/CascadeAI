@@ -127,30 +127,53 @@ def render_audience_selector(
     use_live_generation: bool = False,
 ):
     """Render the audience narrative selector with toggle."""
-    st.subheader("Audience-Adaptive Narratives")
-    st.caption("Same crisis data, tailored for different stakeholders")
-
-    lang_name, lang_code = LANGUAGE_MAP.get(country.lower(), ("English", "en"))
-    st.info(f"Country: **{country.title()}** | Native language: **{lang_name}** ({lang_code})")
-
-    audience_keys = list(AUDIENCE_CONFIGS.keys())
-    labels = [f"{PLACEHOLDER_NARRATIVES[k]['icon']} {PLACEHOLDER_NARRATIVES[k]['title']}" for k in audience_keys]
-
-    selected_idx = st.radio(
-        "Select audience",
-        range(len(labels)),
-        format_func=lambda i: labels[i],
-        horizontal=True,
+    st.markdown(
+        "<h3 style='color:#e2e8f0; margin-bottom:2px;'>📢 Audience-Adaptive Narratives</h3>"
+        "<p style='color:#64748b; font-size:0.83rem; margin-top:0;'>"
+        "Same crisis data — six voices for six stakeholders</p>",
+        unsafe_allow_html=True,
     )
 
-    selected_key = audience_keys[selected_idx]
+    lang_name, lang_code = LANGUAGE_MAP.get(country.lower(), ("English", "en"))
+    st.markdown(
+        f"<div style='display:inline-flex; align-items:center; gap:8px; background:#1e293b;"
+        f"border:1px solid #334155; border-radius:8px; padding:6px 14px; margin-bottom:12px;'>"
+        f"<span style='color:#94a3b8; font-size:0.82rem;'>🌍 <b style='color:#e2e8f0;'>{country.title()}</b>"
+        f" &nbsp;·&nbsp; 🗣 <b style='color:#a78bfa;'>{lang_name}</b>"
+        f" <span style='color:#475569;'>({lang_code})</span></span></div>",
+        unsafe_allow_html=True,
+    )
+
+    audience_keys = list(AUDIENCE_CONFIGS.keys())
+
+    def _audience_label(key: str) -> str:
+        meta = PLACEHOLDER_NARRATIVES[key]
+        return f"{meta['icon']} {meta['title']}"
+
+    selected_key = st.radio(
+        "Select audience",
+        audience_keys,
+        format_func=_audience_label,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+
     placeholder = PLACEHOLDER_NARRATIVES[selected_key]
 
     st.divider()
-    st.markdown(f"### {placeholder['icon']} {placeholder['title']}")
 
+    lang_note = ""
     if selected_key in ("field_worker", "community_alert"):
-        st.caption(f"Language: {lang_name} ({lang_code})")
+        lang_note = (
+            f"<span style='background:#312e81; color:#a5b4fc; font-size:0.7rem; padding:2px 8px;"
+            f"border-radius:4px; margin-left:10px;'>🗣 {lang_name}</span>"
+        )
+
+    st.markdown(
+        f"<h4 style='color:#e2e8f0; margin-bottom:4px;'>"
+        f"{placeholder['icon']} {placeholder['title']}{lang_note}</h4>",
+        unsafe_allow_html=True,
+    )
 
     if use_live_generation and cascade_impacts:
         with st.spinner(f"Generating {placeholder['title']} with Gemma 4..."):
@@ -164,7 +187,18 @@ def render_audience_selector(
                 predictions=predictions or [],
                 event_summary="Crisis cascade event",
             )
-            st.markdown(narrative.content)
+            content = narrative.content
     else:
-        st.markdown(placeholder["sample"])
-        st.caption("*Demo mode — using pre-generated narrative. Connect Gemma 4 for live generation.*")
+        content = placeholder["sample"]
+
+    st.markdown(
+        f"<div style='background:#0f172a; border:1px solid #1e293b; border-radius:10px;"
+        f"padding:20px 22px; font-size:0.875rem; color:#cbd5e1; line-height:1.7;"
+        f"font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;'>"
+        f"{content.replace(chr(10), '<br>')}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    if not use_live_generation:
+        st.caption("*Demo mode — using pre-generated narrative. Toggle **Use live Gemma 4 generation** above for live output.*")

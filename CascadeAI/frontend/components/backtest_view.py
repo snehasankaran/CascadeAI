@@ -23,8 +23,12 @@ def render_backtest_view(results: list[BacktestResult]):
         return
 
     first = results[0]
-    st.subheader(f"Backtest: {first.crisis_name}")
-    st.caption(f"Trigger: {first.trigger_event} ({first.trigger_date})")
+    st.markdown(
+        f"<h2 style='color:#e2e8f0; margin-bottom:2px;'>📊 {first.crisis_name}</h2>"
+        f"<p style='color:#64748b; font-size:0.85rem; margin-top:0;'>"
+        f"Trigger: {first.trigger_event} &nbsp;·&nbsp; {first.trigger_date}</p>",
+        unsafe_allow_html=True,
+    )
     st.divider()
 
     total_comparisons = sum(len(r.comparisons) for r in results)
@@ -33,6 +37,7 @@ def render_backtest_view(results: list[BacktestResult]):
     )
     accuracy_pct = (within_range / total_comparisons * 100) if total_comparisons > 0 else 0
 
+    acc_color = "#22c55e" if accuracy_pct >= 80 else "#f97316" if accuracy_pct >= 60 else "#ef4444"
     col1, col2, col3 = st.columns(3)
     col1.metric("Countries Tested", len(results))
     col2.metric("Predictions", total_comparisons)
@@ -114,7 +119,15 @@ def _render_upstream_context(scenario: dict):
 
 def _render_country_backtest(result: BacktestResult, scenario_data: dict | None = None):
     """Render backtest results for a single country."""
-    st.markdown(f"### {result.country.replace('_', ' ').title()}")
+    country_title = result.country.replace("_", " ").title()
+
+    st.markdown(
+        f"<div style='background:linear-gradient(90deg,#1e1b4b,#0f172a); "
+        f"border-left:4px solid #6366f1; border-radius:8px; padding:10px 16px; margin-bottom:8px;'>"
+        f"<span style='font-size:1.05rem; font-weight:700; color:#e2e8f0;'>🌍 {country_title}</span>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
 
     cascade_path = None
     if scenario_data:
@@ -128,11 +141,12 @@ def _render_country_backtest(result: BacktestResult, scenario_data: dict | None 
     if result.comparisons:
         rows = []
         for c in result.comparisons:
-            accuracy_icon = (
-                "Within Range" if c.accuracy == "within_range"
-                else "Close" if c.accuracy == "close"
-                else "Miss"
-            )
+            if c.accuracy == "within_range":
+                accuracy_icon = "✅ Within Range"
+            elif c.accuracy == "close":
+                accuracy_icon = "🟡 Close"
+            else:
+                accuracy_icon = "❌ Miss"
             rows.append({
                 "Node": c.node.upper() if c.node else "",
                 "Indicator": c.indicator,
@@ -144,13 +158,22 @@ def _render_country_backtest(result: BacktestResult, scenario_data: dict | None 
         df = pd.DataFrame(rows)
         st.dataframe(df, use_container_width=True, hide_index=True)
 
-    with st.expander(f"BFS Cascade Detail for {result.country.replace('_', ' ').title()}"):
+    with st.expander(f"BFS Cascade Detail — {country_title}"):
         for imp in result.cascade_impacts:
-            seed = " [SEED]" if imp.is_seed else ""
-            st.text(
-                f"  {imp.node:15s} severity={imp.severity:.4f}  "
-                f"delay={imp.delay_days:3d}d  "
-                f"path={' -> '.join(imp.path)}{seed}"
+            seed_badge = (
+                "<span style='background:#312e81;color:#a5b4fc;font-size:0.65rem;"
+                "padding:1px 6px;border-radius:4px;margin-left:6px;'>SEED</span>"
+                if imp.is_seed else ""
+            )
+            sev_color = "#ef4444" if imp.severity >= 0.8 else "#f97316" if imp.severity >= 0.6 else "#eab308" if imp.severity >= 0.4 else "#22c55e"
+            st.markdown(
+                f"<div style='display:flex; justify-content:space-between; align-items:center; "
+                f"font-size:0.78rem; color:#cbd5e1; padding:3px 0; border-bottom:1px solid #1e293b;'>"
+                f"<span style='color:#94a3b8;'>{imp.node}</span>"
+                f"<span style='color:{sev_color}; font-weight:600;'>{imp.severity:.4f}"
+                f"<span style='color:#475569;font-weight:400;'> · {imp.delay_days}d</span></span>"
+                f"{seed_badge}</div>",
+                unsafe_allow_html=True,
             )
 
     st.divider()

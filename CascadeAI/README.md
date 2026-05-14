@@ -1,229 +1,221 @@
 # CascadeAI
 
-**Closing the 120-day gap between when a crisis starts cascading and when the world responds.**
+> Predicting how a single crisis cascades across interconnected global systems — energy, food, health, and displacement — powered by **Gemma 4**.
 
-> Built for the [Gemma 4 Good Hackathon](https://kaggle.com/competitions/gemma-4-good-hackathon) · Global Resilience Track · Powered by Gemma 4
-
----
-
-## The Problem
-
-In 2022, Russia invaded Ukraine. Within hours, wheat exports halted, fertilizer supply was severed, and shipping lanes were disrupted. Yet the world took **120 days** to connect these dots to bread prices in Kenya. By then, 47 million people were food insecure.
-
-Today, **318 million people** face crisis-level hunger — double the number from 2019. Sudan's civil war has cascaded into the world's largest humanitarian crisis. Middle East conflict has driven fertilizer prices up 46% in a single month, devastating planting seasons across Sub-Saharan Africa.
-
-These are not isolated crises. They are **cascades** — where a conflict in one region destroys food systems, health infrastructure, and livelihoods thousands of miles away.
-
-**CascadeAI closes that gap.** It predicts how a single event ripples through energy, food, health, and displacement systems — hours after a crisis begins, not months later.
-
----
-
-## What CascadeAI Does
-
-Given a trigger event (a conflict, climate shock, or economic disruption), CascadeAI:
-
-1. **Detects** the crisis type and severity from natural language using Gemma 4
-2. **Propagates** impacts through a weighted cascade graph (BFS across energy → fertilizer → crop → food → health → displacement)
-3. **Profiles** each affected country's vulnerability (food import dependency, health infrastructure, displacement capacity)
-4. **Generates** tailored response narratives for different stakeholders — WHO, WFP, UNHCR, community leaders — in their local language
-5. **Backtests** predictions against historical crises to validate accuracy
-
-### Validated on Real Crises
-
-| Scenario | CascadeAI Prediction | Actual Outcome | Accuracy |
-|---|---|---|---|
-| Ukraine 2022 — Kenya food price | +40–55% increase | +53% increase | ✓ |
-| Ukraine 2022 — Egypt wheat shortage | Critical shortage in 60–90 days | Shortage in 75 days | ✓ |
-| Sudan 2023 — Displacement | 12–16M displaced | 14M displaced | ✓ |
-| Hormuz 2026 — Fertilizer price | +35–50% surge | +46% surge | ✓ (live) |
+CascadeAI takes a humanitarian event (a war, a fertilizer shock, an EV-policy reversal) and walks an 11-node / 18-edge directed dependency graph to forecast which downstream systems will break, by how much, and how soon, for any of 11 country profiles. Gemma 4 supplies natural-language event detection, per-country numeric predictions, stakeholder dispatch plans, and audience-specific narratives in 8+ native languages.
 
 ---
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  LAYER 3: FRONTEND (Streamlit + Folium maps)                │
-│  Cascade visualization · Backtest explorer · Narratives     │
-├─────────────────────────────────────────────────────────────┤
-│  LAYER 2: GEMMA 4 AGENTS                                    │
-│  EventDetector · ImpactPredictor · NarrativeGenerator       │
-│  VisionAnalyst · Dispatcher · Orchestrator                  │
-├─────────────────────────────────────────────────────────────┤
-│  LAYER 1: DETERMINISTIC CORE (pure Python — runs anywhere)  │
-│  CascadeGraph (BFS) · Country Profiles · Data Fetchers      │
-│  Crisis Replay Engine · Compound BFS · FastAPI Backend      │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    User[User] --> UI[Streamlit app.py]
+    User --> API[FastAPI api.py]
+    UI --> Orchestrator[Orchestrator]
+    API --> Orchestrator
+    Orchestrator --> Detector[Event Detector]
+    Orchestrator --> BFS[CascadeGraph BFS]
+    Orchestrator --> Predictor[Impact Predictor]
+    Orchestrator --> Dispatcher[Dispatcher]
+    Orchestrator --> Narrator[Narrative Generator]
+    Detector --> Gemma[GemmaClient]
+    Predictor --> Gemma
+    Dispatcher --> Gemma
+    Narrator --> Gemma
+    Gemma --> Backend{Google AI Studio or Ollama}
+    BFS --> Graph[(coefficients.json)]
+    BFS --> Profiles[(country_profiles/)]
+    UI --> Backtests[(data/backtest/)]
+    UI --> Predictions[(data/predictions/)]
 ```
 
-### Gemma 4 Integration Points
-
-| Capability | Where Used |
-|---|---|
-| **Function calling** | `EventDetector` — structured crisis extraction from news text |
-| **Multilingual generation** | `NarrativeGenerator` — stakeholder reports in local languages |
-| **Multimodal (vision)** | `VisionAnalyst` — satellite/news image analysis |
-| **Edge deployment** | Runs fully offline via Ollama on a $300 laptop |
-| **Google AI Studio** | Cloud mode for high-throughput inference |
-| **RAG** | Country profiles + historical data grounding |
-| **Fine-tuning ready** | Unsloth-compatible for domain adaptation |
+The cascade engine in [`cascade/traversal.py`](CascadeAI/cascade/traversal.py) is fully deterministic — Gemma is only used for the natural-language layers around it.
 
 ---
 
-## Project Structure
+## Project layout
 
 ```
 CascadeAI/
-├── agents/                  # Gemma 4 powered agents
-│   ├── event_detector.py    # Natural language → crisis type + severity
-│   ├── impact_predictor.py  # Country-level impact forecasting
-│   ├── narrative_generator.py  # Stakeholder-specific multilingual reports
-│   ├── vision_analyst.py    # Image/satellite analysis
-│   ├── dispatcher.py        # Route queries to correct agent
-│   └── orchestrator.py      # Multi-agent coordination
-├── cascade/
-│   ├── graph.py             # Weighted directed cascade graph
-│   ├── traversal.py         # BFS propagation engine
-│   └── replay.py            # Historical backtest engine
-├── data/
-│   ├── country_profiles/    # 11 country vulnerability profiles (JSON)
-│   ├── backtest/            # Historical crisis datasets
-│   ├── predictions/         # Forward scenario predictions (2026)
-│   └── fetchers/            # ACLED, EIA, World Bank, ReliefWeb APIs
-├── frontend/
-│   ├── app.py               # Streamlit main app
-│   └── components/          # Map, impact cards, backtest view
-├── models/
-│   ├── gemma_client.py      # Unified Gemma 4 client (Ollama + Google AI)
-│   └── function_schemas.py  # Tool call schemas
-├── api.py                   # FastAPI REST backend
-├── config.py                # Environment configuration
-└── requirements.txt
+├── README.md
+├── LICENSE
+├── .env.example
+├── .gitignore
+└── CascadeAI/
+    ├── api.py                      # FastAPI backend
+    ├── config.py                   # loads .env
+    ├── requirements.txt
+    ├── agents/                     # Gemma 4 agents
+    │   ├── event_detector.py
+    │   ├── impact_predictor.py
+    │   ├── dispatcher.py
+    │   ├── narrative_generator.py
+    │   ├── vision_analyst.py
+    │   └── orchestrator.py
+    ├── cascade/                    # Deterministic BFS engine
+    │   ├── graph.py
+    │   ├── traversal.py
+    │   ├── replay.py               # Backtest framework
+    │   └── data/coefficients.json  # 11 nodes / 18 edges
+    ├── data/
+    │   ├── country_profiles/       # 11 country JSONs
+    │   ├── backtest/               # Historical scenarios
+    │   ├── predictions/            # Forward predictions
+    │   └── fetchers/               # World Bank / EIA / ACLED / ReliefWeb
+    ├── frontend/
+    │   ├── app.py                  # Streamlit dashboard
+    │   └── components/
+    ├── models/
+    │   ├── gemma_client.py         # Auto-switches Google ↔ Ollama
+    │   └── function_schemas.py
+    └── tests/
 ```
 
 ---
 
-## Quick Start
+## Quickstart
 
-### Prerequisites
-
-- Python 3.11+
-- [Ollama](https://ollama.com) (for local/offline mode) **or** a Google AI Studio API key (for cloud mode)
-
-### 1. Clone & Install
+### 1. Install
 
 ```bash
-git clone https://github.com/snehasankaran/CascadeAI.git
+git clone <repo-url>
 cd CascadeAI
-pip install -r requirements.txt
+
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+
+pip install -r CascadeAI/requirements.txt
 ```
 
-### 2. Configure Environment
+### 2. Configure environment
 
-Copy `.env.example` to `.env` and set your backend:
+Copy the example env file and fill in your Gemma 4 backend.
 
 ```bash
-cp .env.example .env
+cp .env.example CascadeAI/.env
 ```
 
-**Option A — Local (Ollama, fully offline):**
-```env
+Edit `CascadeAI/.env`:
+
+```
+GEMMA_API_BASE=https://generativelanguage.googleapis.com/v1beta
+GEMMA_API_KEY=your-google-ai-studio-key
+GEMMA_MODEL=gemma-4-31b-it
+```
+
+Or run locally with Ollama:
+
+```
 GEMMA_API_BASE=http://localhost:11434/v1
 GEMMA_API_KEY=ollama
 GEMMA_MODEL=gemma4:e2b
 ```
 
-Pull the model:
-```bash
-ollama pull gemma4:e2b
-```
-
-**Option B — Cloud (Google AI Studio):**
-```env
-GEMMA_API_BASE=https://generativelanguage.googleapis.com/v1beta
-GEMMA_API_KEY=your_google_ai_studio_key
-GEMMA_MODEL=gemma-4-31b-it
-```
-
-### 3. Run the Backend API
+### 3. Run the dashboard
 
 ```bash
-uvicorn api:app --reload --port 8000
-```
-
-API docs available at: `http://localhost:8000/docs`
-
-### 4. Run the Frontend
-
-```bash
+cd CascadeAI
 streamlit run frontend/app.py
 ```
 
----
-
-## API Reference
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/cascade` | POST | Run cascade prediction from a trigger event |
-| `/cascade/compound` | POST | Multi-event compound cascade |
-| `/detect` | POST | Detect crisis type from natural language |
-| `/narrative` | POST | Generate stakeholder narrative |
-| `/backtest/{scenario}` | GET | Run historical backtest |
-| `/predictions` | GET | List forward scenario predictions |
-| `/countries` | GET | List available country profiles |
-| `/graph` | GET | Return cascade graph structure |
-
-### Example: Predict cascade from Sudan conflict
+### 4. (Optional) Run the API
 
 ```bash
-curl -X POST http://localhost:8000/cascade \
-  -H "Content-Type: application/json" \
-  -d '{"node": "war", "severity": 0.85, "country": "kenya"}'
+cd CascadeAI
+uvicorn api:app --reload --port 8000
 ```
 
----
-
-## Supported Countries
-
-Bangladesh · Chile · Congo DRC · Egypt · Ethiopia · India · Indonesia · Kenya · Pakistan · Somalia · Turkey
+Visit `http://localhost:8000/docs` for the OpenAPI explorer.
 
 ---
 
-## Backtest Scenarios
+## Dashboard modes
 
-| Scenario | Date | Description |
-|---|---|---|
-| `ukraine_2022` | Feb 24, 2022 | Russia-Ukraine war → global food crisis |
-| `sudan_2023` | Apr 15, 2023 | Sudan civil war → famine + displacement |
-| `hormuz_2026` | Mar 2026 | Strait of Hormuz disruption → fertilizer surge |
-| `bev_crash_2025` | 2025 | EV market crash → supply chain cascade |
+| Mode | What it does |
+|---|---|
+| **Crisis Simulator** | Pick a crisis node + severity + countries, see the BFS cascade with map, cards, and detail table. |
+| **Backtest Validation** | Replay historical crises (Ukraine 2022, Sudan 2023, BEV crash 2025, Hormuz 2026) and compare predictions to actuals. |
+| **Live Predictions** | Browse forward-looking scenarios CascadeAI is currently tracking. |
+| **Compound Crisis** | Run two simultaneous events on one country with severity combined as `a + b − a·b`. |
+| **Event Detector** | Type a free-text crisis description; Gemma 4 classifies it into a graph node + severity, then runs the cascade. |
 
----
-
-## Live 2026 Validation
-
-CascadeAI's cascade graph edges are validated against current real-world data:
-
-| Edge | Weight | 2026 Evidence |
-|---|---|---|
-| WAR → DISPLACEMENT | 0.90 | Sudan: 14M displaced ✓ |
-| WAR → HEALTH | 0.60 | Sudan: 70% healthcare collapsed ✓ |
-| ENERGY → FERTILIZER | 0.85 | Hormuz: urea +46% in one month ✓ |
-| FERTILIZER → CROP | 0.75 | Sub-Saharan Africa planting at risk (emerging) |
-| FOOD → HEALTH | 0.85 | Sudan: 4.2M children acutely malnourished ✓ |
+The **Audience Narratives** tab generates the same event in 6 voices — WHO briefing, field-worker alert, policy brief, media summary, community alert (translated to the local language), and public awareness brief.
 
 ---
 
-## Hackathon Submission
+## Gemma 4 backends
 
-- **Competition**: [Gemma 4 Good Hackathon](https://kaggle.com/competitions/gemma-4-good-hackathon)
-- **Track**: Global Resilience (Impact Track)
-- **Model**: Gemma 4 (gemma4:e2b local / gemma-4-31b-it cloud)
-- **Deadline**: May 18, 2026
+CascadeAI ships with one client ([`models/gemma_client.py`](CascadeAI/models/gemma_client.py)) that auto-detects which API format to use based on the URL.
+
+| Backend | `GEMMA_API_BASE` | `GEMMA_API_KEY` | `GEMMA_MODEL` |
+|---|---|---|---|
+| **Google AI Studio** (cloud) | `https://generativelanguage.googleapis.com/v1beta` | your API key | e.g. `gemma-4-31b-it` |
+| **Ollama** (local / edge) | `http://localhost:11434/v1` | `ollama` | e.g. `gemma4:e2b` |
+
+The client also honors `HTTPS_PROXY` / `HTTP_PROXY` for corporate networks.
+
+---
+
+## Tests
+
+The tests are runnable scripts (no pytest harness yet — see Roadmap):
+
+```bash
+cd CascadeAI
+
+python tests/test_p0.py              # Smoke: graph loads, BFS runs, profiles work
+python tests/test_predictions.py     # Validates all forward-prediction JSONs
+python tests/test_bev_backtest.py    # Replays the BEV 2025 backtest
+python tests/test_data_fetchers.py   # Hits World Bank / EIA / ACLED / ReliefWeb (with fallbacks)
+python tests/test_api.py             # Live Gemma round-trip — needs GEMMA_API_KEY
+python tests/test_full_pipeline.py   # Detector → BFS → Swahili narrative — needs GEMMA_API_KEY
+```
+
+`test_api.py` and `test_full_pipeline.py` will skip themselves if `GEMMA_API_KEY` is unset or equal to `ollama`.
+
+---
+
+## Security note
+
+> **A live-looking Google AI Studio key (prefix `AIzaSyBGxomsSzlRz...`) was previously committed to this repo in `tests/test_full_pipeline.py` and `tests/test_api.py`. It has now been removed, but if you ever pulled an earlier copy of those files, treat the key as compromised: revoke and rotate it in the Google AI Studio console.**
+
+`.env` is git-ignored ([`.gitignore`](.gitignore)). Never commit secrets — always use `.env` or your shell environment.
+
+---
+
+## Data sources
+
+The cascade graph and country profiles are grounded in publicly cited sources:
+
+- **IEA** — energy supply & pricing
+- **FAO / FPI / IFPRI** — fertilizer, crop yields, food price index
+- **World Bank** — GDP, CPI, FX, food prices
+- **WHO** — health indicators, malnutrition
+- **UNHCR / IOM** — displacement & migration
+- **UNICEF / WHO JMP** — water & sanitation
+- **IMF WEO** — macroeconomic projections
+- **ILO** — employment
+- **ACLED** — conflict events
+- **ReliefWeb** — humanitarian situation reports
+- **EIA** — energy commodity prices
+
+Per-edge attributions are inline in [`cascade/data/coefficients.json`](CascadeAI/cascade/data/coefficients.json).
+
+---
+
+## Roadmap
+
+- pytest harness + GitHub Actions CI
+- Edges/arrows on the cascade map between origin region and affected countries
+- Live data wiring (currently most fetchers fall back to cached baselines)
+- Refactor duplicated `HTTPS_PROXY` reads across fetchers and Gemma client
 
 ---
 
 ## License
 
-MIT License — open source, open data, open model.
+[MIT](LICENSE) — see the LICENSE file. Built for the Gemma 4 challenge.

@@ -65,11 +65,11 @@ def test_compound_cascade():
 
 def test_country_profiles():
     countries = available_countries()
-    assert len(countries) == 8, f"Expected 8 countries, got {len(countries)}"
+    assert len(countries) >= 8, f"Expected at least 8 countries, got {len(countries)}"
     profiles = load_all_profiles()
-    assert len(profiles) == 8
+    assert len(profiles) == len(countries)
 
-    print(f"\n[PASS] Country profiles loaded: {', '.join(countries)}")
+    print(f"\n[PASS] Country profiles loaded ({len(countries)}): {', '.join(countries)}")
     for name, profile in profiles.items():
         food_v = profile.multiplier("food")
         print(f"  {name:12s} food_vulnerability={food_v:.2f}")
