@@ -22,6 +22,8 @@ Consider Mary Wanjiku, a Senior Programme Officer at a Nairobi humanitarian agen
 
 CascadeAI takes a single trigger event (*"Hormuz shipping disrupted, severity 0.8"*) and walks an **11-node / 18-edge directed dependency graph** to forecast which downstream systems will break, in which country, by how much, and on what timeline. The cascade math is **fully deterministic** — pure BFS over a coefficient graph grounded in IEA, FAO, IFPRI, UNHCR, WHO, ILO, and World Bank source data. Gemma 4 supplies the natural-language layer around it.
 
+This architecture intentionally separates prediction from generation: **Gemma 4 explains and verifies the cascade, but never invents the cascade itself.** That separation is what makes every number traceable and every forecast reproducible.
+
 Eight agents share one `GemmaClient` and run in sequence: **Event Detector** (NL → graph seed), **Cascade Analyzer** (deterministic BFS), **Impact Predictor** (per-country numerical forecasts), **Dispatcher** (4-stakeholder action plans), **Action Verifier** (live ReliefWeb + ACLED, classifies each action as *in-progress / partial / blind spot*), **Vision Analyst** (multimodal — satellite tiles, sitrep pages), **Narrative Generator** (8 audience voices × 11 languages), and **Orchestrator**.
 
 The Action Verifier is CascadeAI's most distinctive capability. **It tells responders not just what to do, but what is not being done yet.** Using Gemma 4's native function-calling protocol, it autonomously queries `search_reliefweb_reports`, `lookup_active_response_plans`, and `search_acled_recent` — each data spine auto-degrades from the credentialed v2/v3 API to a public RSS / HDX XLSX fallback so the demo never goes dark — then classifies every recommended action against real, dated-today humanitarian evidence.
@@ -46,13 +48,13 @@ The Ukraine 2022 result is the headline. CascadeAI, running only on pre-February
 
 We also published **four forward predictions** (BEV Second Wave, EU Auto Cascade, Hormuz Escalation, Sudan Famine Spread) with explicit verification windows and named data sources. Anyone can check our accuracy in six months. **We are willing to be wrong in public.**
 
-The Hormuz cascade we modelled while building this project became real before submission: urea prices moved from $480 to $700 per tonne in March 2026 — the dual-disruption pathway is what made the forecast match.
+During development, real-world fertilizer-price volatility aligned with the disruption pathways our Hormuz cascade emphasized. The dual-disruption pathway we added after Ukraine 2022 is what kept the forecasts within range.
 
 ---
 
 ## 4 · Gemma 4 Integration
 
-CascadeAI uses seven distinct Gemma 4 capabilities, each tied to a user need rather than added for show.
+**Gemma 4 was chosen not as a generic chatbot layer, but because its multimodal reasoning, multilingual fluency, and native tool-calling made it uniquely capable of translating deterministic crisis forecasts into operational humanitarian action.** We use five distinct Gemma 4 capabilities, each tied to a user need rather than added for show.
 
 1. **Native function calling — end-to-end live.** The Action Verifier runs multi-turn agentic loops on Gemma 4's `apply_chat_template(tools=[...])` (Ollama / Hugging Face) and `functionDeclarations` (Google AI Studio). Real `tool_call` control tokens — not prompt-engineered JSON — round-trip through `agents/tool_runtime.py` to two auto-degrading humanitarian data spines: **ReliefWeb** (v2 API → public RSS) and **ACLED** (v3 API → ACLED-via-HDX XLSX, CC BY 4.0, no credentials). A green `LIVE · NATIVE TOOL CALLS` badge tells the viewer which transport answered. The blind-spot detection is impossible without this.
 
@@ -60,13 +62,9 @@ CascadeAI uses seven distinct Gemma 4 capabilities, each tied to a user need rat
 
 3. **Multilingual generation — one model, 11 languages.** English, Swahili, Bengali, Hindi, Arabic, Amharic, French, Portuguese, Indonesian, Spanish, Turkish. The same crisis renders as a WHO English briefing, a Swahili community alert, and an Amharic SMS — without a separate translation pipeline.
 
-4. **Dual backend — cloud + edge.** `models/gemma_client.py` auto-detects the backend from the URL. **Gemma 4 31B Dense via Google AI Studio** powers the hosted demo (chosen for its 66.4 MRCR v2 score on 128K context — 22 points ahead of the 26B-A4B MoE variant on the 4-round tool-call coherence the Action Verifier needs). **Gemma 4 E2B via Ollama** runs the identical pipeline on Mary's $300 laptop offline, qualifying CascadeAI for the **Ollama Special Track**. The demo video disconnects from WiFi mid-run; the cascade keeps executing.
+4. **Dual backend — cloud + edge.** `models/gemma_client.py` auto-detects the backend from the URL. **Gemma 4 31B Dense via Google AI Studio** powers the hosted demo, chosen for its long-context multi-turn tool-call coherence (which the Action Verifier requires). **Gemma 4 E2B via Ollama** runs the identical pipeline on Mary's $300 laptop offline, qualifying CascadeAI for the **Ollama Special Track**. The demo video disconnects from WiFi mid-run; the cascade keeps executing.
 
-5. **Structured JSON output.** All six text agents return strict schema-validated contracts; failures fall back gracefully so the dashboard never breaks.
-
-6. **Composable orchestration.** Eight agents share one client. Adding a ninth is ~50 lines.
-
-7. **Reproducible recipe.** We deliberately did not fine-tune for this submission, demonstrating that base Gemma 4 with strong prompts, function calling, and grounded retrieval is sufficient for serious humanitarian work *today*. An Unsloth-ready LoRA recipe and 50 seed training examples live in `notebooks/unsloth_cascadeai_finetune.ipynb` for any agency that wants to specialise the model on their playbook.
+5. **Engineering discipline.** All six text agents return strict schema-validated JSON; failures fall back gracefully so the dashboard never breaks. Eight agents share one client — adding a ninth is ~50 lines. We deliberately did not fine-tune for this submission, demonstrating that base Gemma 4 with strong prompts, function calling, and grounded retrieval is already sufficient for serious humanitarian work *today*. An Unsloth-ready LoRA recipe and 50 seed training examples live in `notebooks/unsloth_cascadeai_finetune.ipynb` for any agency that wants to specialise the model on their playbook.
 
 ---
 
