@@ -22,10 +22,12 @@ tags:
 
 > **Predicting how a single crisis cascades across energy · food · health · displacement — powered by Gemma 4.**
 
-[![Live demo](https://img.shields.io/badge/Live%20Demo-HuggingFace%20Spaces-yellow?logo=huggingface)](<HUGGINGFACE_SPACES_URL>)
+[![Live demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit&logoColor=white)](https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app/)
 [![Video](https://img.shields.io/badge/Video-3%20min%20demo-red?logo=youtube)](<YOUTUBE_URL>)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Gemma 4](https://img.shields.io/badge/Powered%20by-Gemma%204-8b5cf6)](https://ai.google.dev/gemma)
+
+**🟢 Live demo:** [https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app](https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app/) *(cloud backend: Gemma 4 31B via Google AI Studio)*
 
 CascadeAI closes the **120-day gap** between when a humanitarian crisis starts cascading and when the world responds. You give it one trigger — *"Russia invades Ukraine"*, *"Hormuz shipping disrupted"*, *"Sudan civil war escalates"* — and it walks an **11-node × 18-edge directed dependency graph** to forecast which downstream systems will break, in which country, by how much, and on what timeline. The cascade math is **fully deterministic** (BFS over coefficients grounded in IEA, FAO, IFPRI, UNHCR, WHO, ILO, and World Bank data). Gemma 4 supplies natural-language event detection, vision analysis of satellite imagery, function-calling agents that verify response actions against live humanitarian data, and multilingual narratives in 8 voices across 11 languages — running either on **Google AI Studio (cloud)** or **Ollama Gemma 4 E2B (offline, $300 laptop)** with a one-line config switch.
 
