@@ -1,3 +1,23 @@
+---
+title: CascadeAI
+emoji: 🌍
+colorFrom: indigo
+colorTo: blue
+sdk: streamlit
+sdk_version: "1.40.0"
+app_file: frontend/app.py
+pinned: true
+license: mit
+short_description: Predict how a single crisis cascades across energy, food, health, displacement — powered by Gemma 4
+tags:
+  - gemma-4-good-hackathon
+  - humanitarian
+  - cascade-prediction
+  - streamlit
+  - ollama
+  - multilingual
+---
+
 # CascadeAI
 
 > **Predicting how a single crisis cascades across energy · food · health · displacement — powered by Gemma 4.**
