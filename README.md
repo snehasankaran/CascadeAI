@@ -29,7 +29,20 @@ tags:
 
 CascadeAI closes the **120-day gap** between when a humanitarian crisis starts cascading and when the world responds. You give it one trigger — *"Russia invades Ukraine"*, *"Hormuz shipping disrupted"*, *"Sudan civil war escalates"* — and it walks an **11-node × 18-edge directed dependency graph** to forecast which downstream systems will break, in which country, by how much, and on what timeline. The cascade math is **fully deterministic** (BFS over coefficients grounded in IEA, FAO, IFPRI, UNHCR, WHO, ILO, and World Bank data). Gemma 4 supplies natural-language event detection, vision analysis of satellite imagery, function-calling agents that verify response actions against live humanitarian data, and multilingual narratives in 8 voices across 11 languages — running either on **Google AI Studio (cloud)** or **Ollama Gemma 4 E2B (offline, $300 laptop)** with a one-line config switch.
 
-> **Headline result:** 38 of 39 backtest predictions within range across 4 historical crises and 13 countries (**97.4% accuracy** using only data that existed on Day One of each crisis).
+> **Headline result:** 38 of 39 retrospective forecasts landed within their predefined scenario ranges across 4 historical crises and 13 countries (**97.4% within-range performance** using only data that existed on Day One of each crisis).
+
+<!-- TODO: After deploying to Streamlit Cloud, save a screenshot of the Crisis Simulator
+     (running Ukraine 2022 or Hormuz, with cascade map + 2-3 impact cards visible)
+     to docs/dashboard.png and uncomment the line below. -->
+<!-- ![CascadeAI dashboard — Crisis Simulator](docs/dashboard.png) -->
+
+## Why CascadeAI
+
+- **Forecasts crisis cascades *before* food prices move** — buys humanitarian agencies 90+ days of planning lead time on shocks that historically took 120 days to be recognized
+- **Flags humanitarian blind spots** by reconciling predicted impacts against live ReliefWeb situation reports and ACLED conflict events — tells you what *isn't* being addressed yet, not just what is
+- **Runs anywhere** — Gemma 4 31B on the cloud (Google AI Studio) **or** Gemma 4 E2B locally (Ollama, 7 GB, $300 laptop, zero internet) with a one-line config switch
+
+> *"Most crisis tools tell you what's happening. CascadeAI tells you what's not being addressed."*
 
 ---
 
@@ -37,7 +50,7 @@ CascadeAI closes the **120-day gap** between when a humanitarian crisis starts c
 
 ![CascadeAI System Architecture v3](CascadeAI_Architecture_v3.png)
 
-The system is layered intentionally: **the cascade math is deterministic and runs without any LLM**. Gemma 4 only powers the natural-language surfaces (event classification, narratives, tool-calling) around the engine. This is what makes the predictions auditable.
+**Deterministic core. Gemma-powered interface.** The cascade math is a pure-Python BFS over coefficient-grounded edges — *no LLM in the prediction loop*. Gemma 4 only powers the natural-language surfaces (event classification, multilingual narratives, function-calling tool agents) around the engine. This is what makes the predictions auditable: the same input always produces the same cascade, and every number is traceable to a cited coefficient.
 
 ---
 
@@ -53,6 +66,20 @@ The system is layered intentionally: **the cascade math is deterministic and run
 | 🛰️ **Vision Analyst** | Upload a satellite image or sitrep page → Gemma 4 multimodal extracts crisis indicators → seeds the cascade |
 
 Each cascade run produces 5 tabs of output — Cascade Map · Impact Cards · Detail Table · **Action Watch** · **Audience Narratives**.
+
+---
+
+## Try CascadeAI in 60 seconds
+
+After [Quickstart](#quickstart), open the dashboard and walk through the judging-friendly path:
+
+1. **Select** *"Hormuz shipping disruption"* in the Crisis Simulator
+2. **Choose** Kenya and Bangladesh as affected countries
+3. **Click Run cascade** → the 11-node graph traverses in under a second
+4. **Open the Action Watch tab** → see which predicted impacts already have UN response plans (green) and which are **blind spots** (red — not being addressed yet)
+5. **Scroll to Audience Narratives** → render the same finding in Swahili for a Kenyan field worker, then again as a 280-character X post for the public
+
+That is the whole judging story. No setup beyond a Gemma 4 key.
 
 ---
 
@@ -79,7 +106,9 @@ A green `LIVE · NATIVE TOOL CALLS` badge on the dashboard tells you exactly whi
 
 ---
 
-## The headline credibility: 38/39 backtest accuracy
+## The headline credibility: 38/39 retrospective forecasts within range
+
+CascadeAI was backtested against 4 historical crises by **replaying each scenario using only data that existed on Day One** of the event — no peeking, no fine-tuning on the outcome. Each prediction had a *predefined* numeric range (e.g., *"Kenya wheat +35–55% in 60 days"*) and was scored as within-range or miss.
 
 | Scenario | Trigger | Countries | Predictions within range |
 |---|---|---|---|
@@ -92,6 +121,8 @@ A green `LIVE · NATIVE TOOL CALLS` badge on the dashboard tells you exactly whi
 The Ukraine 2022 headline: CascadeAI predicted Kenya wheat would rise 35–55% in 60 days using only pre-February-2022 data. Actual peak (May 2022): **+53%**. It predicted East Africa food-insecure populations would grow by 15–25M in 90–180 days. Actual (Q3 2022): **+23M**.
 
 Where v1 missed: fertilizer impact was under-predicted because the model initially didn't account for Russia *also* being a major fertilizer exporter. The **Compound BFS engine** ([`cascade/traversal.py::run_compound_cascade`](cascade/traversal.py)) is the v2 fix — it lets two seed nodes fire on the same day with severity combined via probabilistic union.
+
+> CascadeAI is built for **anticipatory planning under uncertainty**, not deterministic prophecy. The cascade graph models how humanitarian impacts have historically propagated through known dependencies; novel shocks may still surprise it. The 97.4% number is a measure of within-range backtest performance, not a guarantee for future events.
 
 ---
 
@@ -252,6 +283,20 @@ Each forward prediction has a verification window and explicit data sources to c
 | Sudan Famine — Cross-Border Emergency | ACTIVE | VERY HIGH | Q3 2026 (IPC, FEWS NET) |
 
 Full JSONs with predictions, mechanisms, and verification sources live in [`data/predictions/`](data/predictions/).
+
+---
+
+## Who CascadeAI is for
+
+Built for teams that have to act on incomplete information *before* a crisis fully unfolds:
+
+- **Humanitarian agencies** — WFP, UNHCR, IFRC, OCHA — anticipatory cash transfer planning, prepositioning, donor briefings
+- **Government crisis planners** — sovereign food security and energy resilience desks needing early-warning narratives in local languages
+- **NGO logistics teams** — supply-chain rerouting and stockpile decisions when a shock is still 60–120 days from peak impact
+- **Researchers and policy analysts** — auditing how historical shocks propagated through known dependencies, scenario modeling for future briefs
+- **Hackathon judges** — try the [Live Demo](#cascadeai) and the [60-second path](#try-cascadeai-in-60-seconds) above
+
+The Audience Narrative generator (8 voices × 11 languages) means the same cascade output is renderable for a Geneva policy desk *and* a mother in Turkana — without a separate translation pipeline.
 
 ---
 
