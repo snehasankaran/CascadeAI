@@ -8,7 +8,7 @@
 
 ## 1 · The Problem
 
-318 million people across 68 countries face crisis-level hunger today — double the 2019 figure. These are not isolated events. They are **cascades** — chains of failure where a conflict in one region quietly destroys food systems, health infrastructure, and water access thousands of kilometres away.
+Today, **318 million people across 68 countries face crisis-level hunger — double 2019.** These are not isolated events. They are **cascades** — chains of failure where a conflict in one region quietly destroys food systems, health infrastructure, and water access thousands of kilometres away.
 
 In February 2022, Russia invaded Ukraine. The warning signs of a global food catastrophe were visible within hours — wheat exports halted, fertilizer supply severed, Black Sea shipping disrupted. Yet the world took **120 days** to connect those dots to bread prices in Mombasa. By then, 47 million additional people across East Africa and South Asia were food-insecure. That delay — between when a cascade *begins* and when humanitarian organizations *act* — is the 120-day gap.
 
@@ -26,7 +26,7 @@ This architecture intentionally separates prediction from generation: **Gemma 4 
 
 Eight agents share one `GemmaClient` and run in sequence: **Event Detector** (NL → graph seed), **Cascade Analyzer** (deterministic BFS), **Impact Predictor** (per-country numerical forecasts), **Dispatcher** (4-stakeholder action plans), **Action Verifier** (live ReliefWeb + ACLED, classifies each action as *in-progress / partial / blind spot*), **Vision Analyst** (multimodal — satellite tiles, sitrep pages), **Narrative Generator** (8 audience voices × 11 languages), and **Orchestrator**.
 
-The Action Verifier is CascadeAI's most distinctive capability. **It tells responders not just what to do, but what is not being done yet.** Using Gemma 4's native function-calling protocol, it autonomously queries `search_reliefweb_reports`, `lookup_active_response_plans`, and `search_acled_recent` — each data spine auto-degrades from the credentialed v2/v3 API to a public RSS / HDX XLSX fallback so the demo never goes dark — then classifies every recommended action against real, dated-today humanitarian evidence.
+Action Verifier is CascadeAI's headline differentiator. **It tells responders not just what to do, but what is not being done yet.** Using Gemma 4's native function-calling protocol, it autonomously queries `search_reliefweb_reports`, `lookup_active_response_plans`, and `search_acled_recent` — each data spine auto-degrades from the credentialed v2/v3 API to a public RSS / HDX XLSX fallback so the demo never goes dark — then classifies every recommended action against real, dated-today humanitarian evidence.
 
 What Mary sees: she types *"Hormuz shipping disrupted"*, picks Kenya, and within seconds gets a cascade map, an impact card (*+44% wheat in 60 days, 2.1M affected*), a four-stakeholder action plan, an **Action Watch** panel flagging the unaddressed Sudanese refugee corridor as a blind spot, and a ready-to-send Swahili WhatsApp message for her field network. The same scenario runs on her $300 laptop offline via Ollama Gemma 4 E2B.
 
