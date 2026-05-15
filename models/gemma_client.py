@@ -40,9 +40,18 @@ class GemmaClient:
         return GOOGLE_AI_STUDIO in self.api_base
 
     @property
+    def _is_localhost(self) -> bool:
+        """Detect localhost/loopback endpoints so we can bypass corporate proxies."""
+        base = self.api_base.lower()
+        return any(host in base for host in ("localhost", "127.0.0.1", "0.0.0.0", "::1"))
+
+    @property
     def _http_kwargs(self) -> dict:
         kwargs: dict[str, Any] = {"timeout": self.timeout}
-        if self.proxy:
+        # Only route through the corporate proxy for non-local endpoints.
+        # Sending localhost requests through an HTTP_PROXY yields a 502 because
+        # the proxy can't reach the user's machine.
+        if self.proxy and not self._is_localhost:
             kwargs["proxy"] = self.proxy
         return kwargs
 

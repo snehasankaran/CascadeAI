@@ -74,89 +74,60 @@ def render_cascade_map(
 
         max_sev = max(i.severity for i in impacts) if impacts else 0
         severity_info = _get_severity_level(max_sev)
-        
-        # Get top 3 impacted nodes for popup
+        sev_color = severity_info['color']
+        sev_fill = severity_info['fill']
+        sev_label = severity_info['label'].upper()
+        country_display = raw.get('country', country_name)
+
         top_impacts = sorted(impacts, key=lambda x: -x.severity)[:3]
-        
-        # Build styled popup content
+
+        # Build the Top Impacts rows separately to avoid nested triple-quoted
+        # f-strings (Python 3.10 parser limitation).
+        top_rows = []
+        for imp in top_impacts:
+            row_color = _get_severity_level(imp.severity)['color']
+            node_label = graph.get_node(imp.node).label
+            icon = node_icons.get(imp.node, '•')
+            top_rows.append(
+                f'<div style="display:flex;justify-content:space-between;align-items:center;'
+                f'padding:4px 0;border-bottom:1px solid #1e293b;">'
+                f'<span style="color:#94a3b8;font-size:0.8rem;">{icon} {node_label}</span>'
+                f'<span style="color:{row_color};font-weight:600;font-size:0.8rem;">'
+                f'{imp.severity:.2f}'
+                f'<span style="color:#475569;font-weight:400;font-size:0.7rem;"> · {imp.delay_days}d</span>'
+                f'</span></div>'
+            )
+        top_rows_html = ''.join(top_rows)
+
+        vuln_text = raw.get('key_vulnerability', '')
+        vuln_html = (
+            f'<div style="margin-top:10px;font-size:0.7rem;color:#475569;font-style:italic;">{vuln_text}</div>'
+            if vuln_text else ''
+        )
+
         popup_content = f"""
-        <div style="
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-width: 220px;
-            padding: 4px;
-        ">
-            <div style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 12px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid {severity_info['color']};
-            ">
-                <span style="font-size: 1.3rem; font-weight: 700; color: #e2e8f0;">
-                    {raw.get('country', country_name)}
-                </span>
-                <span style="
-                    background: {severity_info['color']}22;
-                    color: {severity_info['color']};
-                    font-size: 0.7rem;
-                    font-weight: 700;
-                    padding: 3px 10px;
-                    border-radius: 12px;
-                    border: 1px solid {severity_info['color']}55;
-                ">
-                    {severity_info['label'].upper()}
-                </span>
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-width:220px;padding:4px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid {sev_color};">
+                <span style="font-size:1.3rem;font-weight:700;color:#e2e8f0;">{country_display}</span>
+                <span style="background:{sev_color}22;color:{sev_color};font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid {sev_color}55;">{sev_label}</span>
             </div>
-            
-            <div style="margin-bottom: 12px;">
-                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">Max Severity</div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="
-                        width: 80px;
-                        height: 8px;
-                        background: #1e293b;
-                        border-radius: 4px;
-                        overflow: hidden;
-                    ">
-                        <div style="
-                            width: {int(max_sev*100)}%;
-                            height: 100%;
-                            background: linear-gradient(90deg, {severity_info['color']}, {severity_info['fill']});
-                            border-radius: 4px;
-                        "></div>
+            <div style="margin-bottom:12px;">
+                <div style="font-size:0.75rem;color:#64748b;margin-bottom:4px;">Max Severity</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:80px;height:8px;background:#1e293b;border-radius:4px;overflow:hidden;">
+                        <div style="width:{int(max_sev*100)}%;height:100%;background:linear-gradient(90deg,{sev_color},{sev_fill});border-radius:4px;"></div>
                     </div>
-                    <span style="font-size: 1.1rem; font-weight: 700; color: {severity_info['color']};">
-                        {max_sev:.2f}
-                    </span>
+                    <span style="font-size:1.1rem;font-weight:700;color:{sev_color};">{max_sev:.2f}</span>
                 </div>
             </div>
-            
-            <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">
-                Nodes Affected: <span style="color: #94a3b8; font-weight: 600;">{len(impacts)}/{len(graph.nodes)}</span>
+            <div style="font-size:0.75rem;color:#64748b;margin-bottom:8px;">
+                Nodes Affected: <span style="color:#94a3b8;font-weight:600;">{len(impacts)}/{len(graph.nodes)}</span>
             </div>
-            
-            <div style="background: #0f172a; border-radius: 8px; padding: 10px; margin-top: 10px;">
-                <div style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
-                    Top Impacts
-                </div>
-                {''.join([
-                    f"""<div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #1e293b;">
-                        <span style="color: #94a3b8; font-size: 0.8rem;">
-                            {node_icons.get(imp.node, '•')} {graph.get_node(imp.node).label}
-                        </span>
-                        <span style="color: {_get_severity_level(imp.severity)['color']}; font-weight: 600; font-size: 0.8rem;">
-                            {imp.severity:.2f}
-                            <span style="color: #475569; font-weight: 400; font-size: 0.7rem;"> · {imp.delay_days}d</span>
-                        </span>
-                    </div>"""
-                    for imp in top_impacts
-                ])}
+            <div style="background:#0f172a;border-radius:8px;padding:10px;margin-top:10px;">
+                <div style="font-size:0.7rem;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Top Impacts</div>
+                {top_rows_html}
             </div>
-            
-            {f"""<div style="margin-top: 10px; font-size: 0.7rem; color: #475569; font-style: italic;">
-                {raw.get('key_vulnerability', '')}
-            </div>""" if raw.get('key_vulnerability') else ""}
+            {vuln_html}
         </div>
         """
         

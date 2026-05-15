@@ -117,6 +117,25 @@ information for community leaders and civil society organizations.
 - WFP food distribution points: [link]
 - WHO health advisories: [link]""",
     },
+    "social_short": {
+        "title": "Social Media Post (X / Twitter)",
+        "icon": "🐦",
+        "sample": (
+            "⚠️ EARLY WARNING — Kenya: wheat prices projected +40-55% in 60 days "
+            "as global cascade hits East Africa. Stock household staples now; "
+            "support neighbours. #FoodSecurity #EarlyWarning #CascadeAI"
+        ),
+    },
+    "whatsapp_alert": {
+        "title": "WhatsApp / SMS Community Alert",
+        "icon": "💬",
+        "sample": (
+            "⚠️ TAHADHARI: Bei ya ngano inaweza kupanda 40-55% katika miezi 2. "
+            "Hifadhi nafaka za nyumbani sasa. Hifadhi maji safi kwa siku 7. "
+            "Tembelea kituo cha afya kama mtoto wako ana utapiamlo.\n"
+            "Tafadhali tuma ujumbe huu kwa majirani zako. — CascadeAI"
+        ),
+    },
 }
 
 
@@ -162,8 +181,9 @@ def render_audience_selector(
 
     st.divider()
 
+    local_lang_audiences = {"field_worker", "community_alert", "whatsapp_alert"}
     lang_note = ""
-    if selected_key in ("field_worker", "community_alert"):
+    if selected_key in local_lang_audiences:
         lang_note = (
             f"<span style='background:#312e81; color:#a5b4fc; font-size:0.7rem; padding:2px 8px;"
             f"border-radius:4px; margin-left:10px;'>🗣 {lang_name}</span>"
@@ -199,6 +219,26 @@ def render_audience_selector(
         f"</div>",
         unsafe_allow_html=True,
     )
+
+    if selected_key in {"social_short", "whatsapp_alert"}:
+        char_count = len(content)
+        cap = 280 if selected_key == "social_short" else 320
+        colour = "#22c55e" if char_count <= cap else "#f97316"
+        platform_hint = (
+            "Paste into X / Twitter, LinkedIn, Bluesky, or any short-form social channel."
+            if selected_key == "social_short"
+            else "Forward via WhatsApp, Signal, SMS, or local community groups."
+        )
+        st.markdown(
+            f"<div style='display:flex; justify-content:space-between; align-items:center;"
+            f"margin-top:10px; font-size:0.75rem; color:#94a3b8;'>"
+            f"<span>{platform_hint}</span>"
+            f"<span style='color:{colour};'>{char_count} / {cap} chars</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.code(content, language=None)
+        st.caption("Use the copy icon on the code block above to share this alert.")
 
     if not use_live_generation:
         st.caption("*Demo mode — using pre-generated narrative. Toggle **Use live Gemma 4 generation** above for live output.*")

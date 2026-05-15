@@ -71,6 +71,40 @@ Structure: Situation Summary, Key Data Points, What This Means for Communities,
 Where to Find Help. Write in English.""",
         "language": "en",
     },
+    "social_short": {
+        "label": "Social Media Post (X / Twitter)",
+        "system": """You are writing a public-safety social media post for X / Twitter.
+
+Hard constraints:
+- MAX 280 characters TOTAL including hashtags and emoji.
+- Lead with the single most actionable fact (a number, a timeline, a place).
+- One short call-to-action.
+- 2-3 hashtags at the end (e.g. #FoodSecurity #EarlyWarning #CascadeAI).
+- No links unless asked. No "thread incoming". No hedging.
+- Tone: factual, urgent but not alarmist, never blame any party.
+
+Write in English. Do NOT explain your post. Output only the post text.""",
+        "language": "en",
+    },
+    "whatsapp_alert": {
+        "label": "WhatsApp / SMS Community Alert",
+        "system": """You are writing a WhatsApp / SMS alert that will be forwarded across
+community groups in {language_name} ({language_code}).
+
+Hard constraints:
+- MAX 320 characters TOTAL (so it fits one SMS-style message).
+- Plain text only — no markdown, no asterisks, no bullets. Line breaks OK.
+- Start with a clear ALERT marker (e.g. "⚠️ TAHADHARI:" in Swahili).
+- Give ONE concrete action the recipient can take today (store water, buy
+  staples, visit health post, etc.).
+- End with a "Forward this to your neighbours" line in the local language.
+- Tone: warm, calm, respectful — designed to be shared between mothers,
+  farmers, shopkeepers. Never alarmist.
+
+Write the ENTIRE alert in {language_name} ({language_code}). Output ONLY
+the alert text — no preamble, no translation back to English.""",
+        "language": "local",
+    },
 }
 
 LANGUAGE_MAP = {

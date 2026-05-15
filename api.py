@@ -18,6 +18,7 @@ from data.profiles import load_profile, available_countries, get_profile_raw
 from models.gemma_client import GemmaClient
 from agents.event_detector import EventDetector
 from agents.narrative_generator import NarrativeGenerator, AUDIENCE_CONFIGS
+from agents.action_verifier import ActionVerifier
 
 app = FastAPI(
     title="CascadeAI API",
@@ -56,6 +57,18 @@ class NarrativeRequest(BaseModel):
     audience: str = Field(description="Audience key (e.g., 'community_alert')")
     country: str
     cascade_impacts: list[dict]
+    event_summary: str = ""
+
+
+class VerifyRequest(BaseModel):
+    country: str = Field(description="Target country (e.g. 'Kenya')")
+    response_plans: list[dict] = Field(
+        description="Dispatcher response plans (each with stakeholder + actions list)",
+    )
+    region: str | None = Field(
+        default=None,
+        description="Optional ACLED region (e.g. 'East Africa') for conflict context",
+    )
     event_summary: str = ""
 
 
@@ -197,6 +210,39 @@ def run_backtest_endpoint(scenario: str):
 @app.get("/audiences")
 def list_audiences():
     return {k: v["label"] for k, v in AUDIENCE_CONFIGS.items()}
+
+
+@app.post("/verify")
+def verify_actions(req: VerifyRequest):
+    """Check Dispatcher recommendations against current-affairs reporting.
+
+    Returns per-action status (in_progress / partial / gap), blind spots,
+    and the live evidence sources used (ReliefWeb + ACLED).
+    """
+    client = GemmaClient()
+    verifier = ActionVerifier(client)
+    result = verifier.verify(
+        country=req.country,
+        response_plans=req.response_plans,
+        region=req.region,
+        event_summary=req.event_summary,
+    )
+    return {
+        "country": result.country,
+        "verifications": [
+            {
+                "stakeholder": v.stakeholder,
+                "action": v.action,
+                "status": v.status,
+                "evidence": v.evidence,
+                "confidence": v.confidence,
+            }
+            for v in result.verifications
+        ],
+        "blind_spots": result.blind_spots,
+        "coverage_summary": result.coverage_summary,
+        "evidence_sources": result.evidence_sources,
+    }
 
 
 from data.predictions.loader import available_predictions, load_prediction

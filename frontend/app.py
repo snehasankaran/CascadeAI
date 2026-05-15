@@ -8,12 +8,44 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import os
+
 import streamlit as st
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: F401 — loads .env
+
+
+def _gemma_backend() -> tuple[str, str, str, str, str]:
+    """Detect which Gemma 4 backend is configured.
+
+    Returns: (mode_id, label, accent_color, dot_color, tooltip)
+    mode_id is 'offline' for Ollama (any localhost / 127.0.0.1 / Ollama URL),
+    'cloud' for Google AI Studio, 'unset' otherwise.
+    """
+    api_base = (os.getenv("GEMMA_API_BASE") or "").lower()
+    model = os.getenv("GEMMA_MODEL", "")
+    if not api_base:
+        return ("unset", "Backend Not Configured", "#64748b", "#94a3b8", "Set GEMMA_API_BASE in your .env file")
+    if any(s in api_base for s in ("localhost", "127.0.0.1", ":11434", "ollama")):
+        return (
+            "offline",
+            f"Offline · Ollama · {model or 'local'}",
+            "#10b981",
+            "#22c55e",
+            "Running fully on-device via Ollama — no internet required for inference",
+        )
+    if "generativelanguage.googleapis.com" in api_base:
+        return (
+            "cloud",
+            f"Cloud · Google AI Studio · {model or 'gemma-4'}",
+            "#60a5fa",
+            "#3b82f6",
+            "Running on Google AI Studio (cloud). Toggle to Ollama in .env for offline mode.",
+        )
+    return ("custom", f"Custom · {model or api_base}", "#a78bfa", "#a855f7", api_base)
 
 from cascade.graph import CascadeGraph
 from cascade.traversal import run_cascade, run_compound_cascade, CascadeImpact
@@ -24,6 +56,8 @@ from frontend.components.impact_cards import render_impact_cards
 from frontend.components.backtest_view import render_backtest_view
 from frontend.components.audience_selector import render_audience_selector
 from frontend.components.predictions_view import render_predictions_view
+from frontend.components.action_watch import render_action_watch
+from frontend.components.vision_analyst_view import render_vision_analyst
 from data.predictions.loader import available_predictions, load_prediction
 
 
@@ -38,15 +72,20 @@ st.markdown("""
 <style>
     /* ── Typography ── */
     .main-header {
-        font-size: 2.8rem; font-weight: 800; margin-bottom: 0;
+        font-size: 2.8rem; font-weight: 800;
+        margin: 0; padding: 6px 0 2px 0;
+        line-height: 1.15;
+        display: inline-block;
         background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 30%, #60a5fa 60%, #38bdf8 100%);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.25));
     }
     .sub-header {
-        font-size: 1.1rem; color: #94a3b8; margin-top: -4px; margin-bottom: 8px;
+        font-size: 1.1rem; color: var(--cai-text-muted, #94a3b8);
+        margin: 0; padding-top: 2px; padding-bottom: 4px;
         letter-spacing: 0.02em; font-weight: 400;
+        line-height: 1.4;
     }
     
     /* ── Animations ── */
@@ -598,7 +637,7 @@ def _show_welcome():
         {"icon": "📈", "title": "Backtest Validation",
          "desc": "Validate against real historical data including Ukraine 2022, Sudan 2023, BEV Crash 2025, and Hormuz 2026 scenarios.",
          "color": "#3b82f6", "badge": None},
-        {"icon": "🔮", "title": "Live Predictions",
+        {"icon": "🔮", "title": "Forward Predictions",
          "desc": "Explore forward-looking scenarios currently being tracked: BEV Second Wave, EU Auto Cascade, Hormuz Escalation, and more.",
          "color": "#10b981", "badge": "Active"},
         {"icon": "⚡", "title": "Compound Crisis",
@@ -607,6 +646,9 @@ def _show_welcome():
         {"icon": "🧠", "title": "Event Detector",
          "desc": "Describe any crisis in natural language. Gemma 4 automatically classifies the event type, estimates severity, and runs the full cascade analysis.",
          "color": "#ec4899", "badge": "AI-Powered"},
+        {"icon": "🛰️", "title": "Vision Analyst",
+         "desc": "Upload a satellite image, sitrep page, or field photo. Gemma 4 multimodal extracts crisis indicators, estimates severity, and seeds the cascade.",
+         "color": "#06b6d4", "badge": "Multimodal"},
     ]
 
     def _build_card(mode: dict) -> str:
@@ -671,7 +713,10 @@ graph = get_graph()
 
 
 # ── Sidebar ───────────────────────────────────────────────────────
+_backend_mode, _backend_label, _backend_accent, _backend_dot, _backend_tooltip = _gemma_backend()
+
 with st.sidebar:
+    icon = {"offline": "📡", "cloud": "☁️", "custom": "🛠️", "unset": "⚠️"}.get(_backend_mode, "🤖")
     st.markdown(
         '<div style="text-align:center;padding:14px 0 20px;">'
         '<div class="globe-container" style="margin-bottom:10px;width:78px;height:78px;">'
@@ -681,11 +726,13 @@ with st.sidebar:
         'background:linear-gradient(90deg,#8b5cf6,#a78bfa,#60a5fa);'
         '-webkit-background-clip:text;-webkit-text-fill-color:transparent;">CascadeAI</h1>'
         '<p style="color:#64748b;font-size:0.8rem;margin:6px 0 0;">Crisis Cascade Prediction</p>'
-        '<div style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;'
-        'background:rgba(139,92,246,0.15);padding:4px 12px;border-radius:20px;'
-        'border:1px solid rgba(139,92,246,0.3);">'
-        '<span style="width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block;"></span>'
-        '<span style="color:#a78bfa;font-size:0.75rem;font-weight:600;">Gemma 4 Active</span>'
+        f'<div title="{_backend_tooltip}" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;'
+        f'background:{_backend_accent}1f;padding:5px 12px;border-radius:20px;'
+        f'border:1px solid {_backend_accent}55;">'
+        f'<span style="width:8px;height:8px;background:{_backend_dot};border-radius:50%;display:inline-block;'
+        f'box-shadow:0 0 8px {_backend_dot}99;"></span>'
+        f'<span style="color:{_backend_accent};font-size:0.72rem;font-weight:700;letter-spacing:0.02em;">'
+        f'{icon} {_backend_label}</span>'
         '</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -695,7 +742,14 @@ with st.sidebar:
 
     mode = st.radio(
         "Mode",
-        ["Crisis Simulator", "Backtest Validation", "Live Predictions", "Compound Crisis", "Event Detector (Gemma 4)"],
+        [
+            "Crisis Simulator",
+            "Backtest Validation",
+            "Forward Predictions",
+            "Compound Crisis",
+            "Event Detector (Gemma 4)",
+            "Vision Analyst (Gemma 4 Multimodal)",
+        ],
         index=0,
     )
     st.divider()
@@ -734,7 +788,7 @@ with st.sidebar:
         run_btn = st.button("Run Backtest", type="primary", width="stretch")
         st.caption("Replays a historical crisis and compares predictions to actuals.")
 
-    elif mode == "Live Predictions":
+    elif mode == "Forward Predictions":
         st.subheader("Forward Predictions")
         st.caption("Active cascades CascadeAI is tracking right now")
         pred_names = available_predictions()
@@ -765,22 +819,45 @@ with st.sidebar:
         run_btn = st.button("Run Compound", type="primary", width="stretch")
         st.caption("Combines both severities via probabilistic union (a + b − a·b).")
 
-    else:  # Event Detector
+    elif mode == "Event Detector (Gemma 4)":
         st.subheader("Natural Language Event")
         st.caption("Describe a crisis and Gemma 4 will classify it")
         run_btn = False
 
+    else:  # Vision Analyst (Gemma 4 Multimodal)
+        st.subheader("Vision Analyst")
+        st.caption("Upload an image — Gemma 4 multimodal reads it and seeds the cascade.")
+        run_btn = False
+
 
 # ── Main Content ──────────────────────────────────────────────────
+_header_icon = {"offline": "📡", "cloud": "☁️", "custom": "🛠️", "unset": "⚠️"}.get(_backend_mode, "🤖")
+_header_backend_pill = (
+    f'<span title="{_backend_tooltip}" style="display:inline-flex;align-items:center;gap:6px;'
+    f'background:{_backend_accent}1f;padding:5px 12px;border-radius:20px;'
+    f'border:1px solid {_backend_accent}55;font-size:0.72rem;font-weight:700;'
+    f'color:{_backend_accent};letter-spacing:0.02em;">'
+    f'<span style="width:8px;height:8px;background:{_backend_dot};border-radius:50%;display:inline-block;'
+    f'box-shadow:0 0 8px {_backend_dot}99;"></span>'
+    f'{_header_icon} {_backend_label}'
+    '</span>'
+)
+
 st.markdown(
-    '<div style="display:flex; align-items:center; gap:16px; margin-bottom:2px;">'
+    '<div style="display:flex; align-items:center; gap:16px; margin:24px 0 8px 0; overflow:visible;">'
     '<div class="globe-container" style="width:58px;height:58px;flex-shrink:0;">'
     f'{_globe_svg(58, "hdr")}'
     '</div>'
-    '<div>'
-      '<p class="main-header">CascadeAI</p>'
-      '<p class="sub-header">Predicting how crises cascade across energy · food · health · displacement — powered by Gemma 4</p>'
+    '<div style="flex:1; min-width:0; overflow:visible;">'
+      '<div style="font-size:2.8rem; font-weight:800; line-height:1.25; padding:4px 0;'
+      ' background:linear-gradient(90deg,#8b5cf6 0%,#a78bfa 30%,#60a5fa 60%,#38bdf8 100%);'
+      ' -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;'
+      ' filter:drop-shadow(0 0 14px rgba(139,92,246,0.25));">CascadeAI</div>'
+      '<div style="font-size:1.05rem; color:#94a3b8; line-height:1.45; margin-top:2px;">'
+      'Predicting how crises cascade across energy · food · health · displacement — powered by Gemma 4'
+      '</div>'
     '</div>'
+    f'<div style="flex-shrink:0;">{_header_backend_pill}</div>'
     '</div>',
     unsafe_allow_html=True,
 )
@@ -805,8 +882,8 @@ if mode == "Crisis Simulator":
         all_impacts = st.session_state["sim_impacts"]
         sim_countries = st.session_state.get("sim_countries", list(all_impacts.keys()))
 
-        tab_map, tab_cards, tab_table, tab_audience = st.tabs(
-            ["🗺️ Cascade Map", "📊 Impact Cards", "📋 Detail Table", "📢 Audience Narratives"]
+        tab_map, tab_cards, tab_table, tab_action, tab_audience = st.tabs(
+            ["🗺️ Cascade Map", "📊 Impact Cards", "📋 Detail Table", "🛰️ Action Watch", "📢 Audience Narratives"]
         )
 
         with tab_map:
@@ -817,6 +894,24 @@ if mode == "Crisis Simulator":
 
         with tab_table:
             _render_detail_table(all_impacts, graph)
+
+        with tab_action:
+            action_country = st.selectbox(
+                "Country to verify",
+                options=sim_countries,
+                key="sim_action_country",
+            )
+            use_live_action = st.toggle(
+                "Use live action verification (calls Gemma 4 + ReliefWeb)",
+                value=False,
+                key="sim_action_live",
+            )
+            render_action_watch(
+                country=action_country,
+                response_plans=None,
+                event_summary=f"{graph.get_node(event_node).label} crisis at severity {severity:.2f}" if run_btn else "",
+                use_live_generation=use_live_action,
+            )
 
         with tab_audience:
             audience_country = st.selectbox(
@@ -845,7 +940,7 @@ elif mode == "Backtest Validation":
     else:
         st.info("Select a backtest scenario and click **Run Backtest** to validate CascadeAI against real historical data.")
 
-elif mode == "Live Predictions":
+elif mode == "Forward Predictions":
     if run_btn:
         pred_data = load_prediction(selected_pred)
         st.session_state["pred_data"] = pred_data
@@ -854,7 +949,7 @@ elif mode == "Live Predictions":
         render_predictions_view(st.session_state["pred_data"])
     else:
         st.markdown("""
-### Live Predictions — What CascadeAI Sees Coming
+### Forward Predictions — What CascadeAI Sees Coming
 
 These are **active cascades** CascadeAI is tracking right now. Each prediction includes:
 - **Confidence level** based on validated model accuracy (38/39 backtests within range)
@@ -904,7 +999,7 @@ elif mode == "Compound Crisis":
     else:
         st.info("Configure two simultaneous events and click **Run Compound** to see overlapping cascade paths.")
 
-else:  # Event Detector
+elif mode == "Event Detector (Gemma 4)":
     st.subheader("Event Detector — Natural Language Input")
     st.caption("Describe a crisis event in plain text. Gemma 4 will classify it and run the cascade.")
 
@@ -964,8 +1059,8 @@ else:  # Event Detector
 
         st.divider()
 
-        tab_map, tab_cards, tab_table, tab_audience = st.tabs(
-            ["🗺️ Cascade Map", "📊 Impact Cards", "📋 Detail Table", "📢 Audience Narratives"]
+        tab_map, tab_cards, tab_table, tab_action, tab_audience = st.tabs(
+            ["🗺️ Cascade Map", "📊 Impact Cards", "📋 Detail Table", "🛰️ Action Watch", "📢 Audience Narratives"]
         )
 
         with tab_map:
@@ -974,6 +1069,23 @@ else:  # Event Detector
             render_impact_cards(all_impacts, graph)
         with tab_table:
             _render_detail_table(all_impacts, graph)
+        with tab_action:
+            action_country_det = st.selectbox(
+                "Country to verify",
+                options=saved_countries,
+                key="detect_action_country",
+            )
+            use_live_action_det = st.toggle(
+                "Use live action verification (calls Gemma 4 + ReliefWeb)",
+                value=False,
+                key="detect_action_live",
+            )
+            render_action_watch(
+                country=action_country_det,
+                response_plans=None,
+                event_summary=event.summary or "",
+                use_live_generation=use_live_action_det,
+            )
         with tab_audience:
             audience_country = st.selectbox(
                 "Select country for narratives",
@@ -986,3 +1098,6 @@ else:  # Event Detector
                 cascade_impacts=_impacts_to_dicts(all_impacts[audience_country]),
                 use_live_generation=use_live,
             )
+
+else:  # Vision Analyst (Gemma 4 Multimodal)
+    render_vision_analyst()

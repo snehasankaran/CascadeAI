@@ -1,26 +1,47 @@
-# Secrets & environment
-.env
-*.env
-*.env.*
-!.env.example
-
-# Python
+﻿# Python
+.venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
-.venv/
-venv/
-env/
-*.log
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
 
-# OS
-.DS_Store
-Thumbs.db
+# Env
+.env
+.env.local
+*.env.backup
 
 # IDE
 .vscode/
 .idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local scratch folders (kept locally, never pushed)
+/CascadeAI/
+/CascadeAI 1/
+/CascadeAI 2/
+/CascadeAI*.zip
+/BATTLE_PLAN.md
+
+# Old/duplicate architecture diagrams (only v3 is referenced in README)
+/Architecture.png
+/CascadeAI_Architecture_v2_Final.png
+/CascadeAI_Updated_Architecture.png
+/Final Arch.png
+
+# Internal planning / scratch docs (not for public repo)
+/MAIN_TRACK_STRATEGY.md
+/OUTREACH_TEMPLATES.md
+/VIDEO_SCRIPT.md
+/VIDEO_SCRIPT_FINAL.md
+/KAGGLE_WRITEUP.md
+
+# Generated artifacts
+*.log
+
+# Auto-downloaded data cache (regenerable from live API)
+/data/cache/

@@ -9,14 +9,14 @@ EVENT_DETECTOR_TOOLS = [
         "type": "function",
         "function": {
             "name": "search_acled_events",
-            "description": "Search ACLED for recent conflict events in a region",
+            "description": "Search ACLED for recent conflict events. Use ``country`` for country-scoped data (preferred), or ``region`` to aggregate.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "region": {"type": "string", "description": "Region or country name"},
+                    "country": {"type": "string", "description": "Country name (preferred)"},
+                    "region": {"type": "string", "description": "Region label, used when country is unknown"},
                     "days": {"type": "integer", "description": "Look back N days", "default": 30},
                 },
-                "required": ["region"],
             },
         },
     },
@@ -140,6 +140,66 @@ IMPACT_PREDICTOR_TOOLS = [
                     "to_node": {"type": "string", "description": "Target node ID"},
                 },
                 "required": ["from_node", "to_node"],
+            },
+        },
+    },
+]
+
+ACTION_VERIFIER_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_reliefweb_reports",
+            "description": (
+                "Search ReliefWeb for the latest humanitarian situation reports "
+                "for a country (used to check if responders are already acting)."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "country": {"type": "string", "description": "Country name"},
+                    "query": {"type": "string", "description": "Optional keyword filter (e.g. 'food distribution', 'cholera')"},
+                    "limit": {"type": "integer", "description": "Max reports to return", "default": 10},
+                },
+                "required": ["country"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_acled_recent",
+            "description": (
+                "Look up recent ACLED political-violence activity (events + "
+                "fatalities, last 30 days) to check current security context "
+                "against recommended actions. Pass ``country`` for a "
+                "country-scoped summary (preferred), or ``region`` to "
+                "aggregate across multiple countries in that region."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "country": {"type": "string", "description": "Country name (preferred over region for accuracy)"},
+                    "region": {"type": "string", "description": "Region label (e.g. 'East Africa') used when country is not known"},
+                    "days": {"type": "integer", "description": "Lookback window in days", "default": 30},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "lookup_active_response_plans",
+            "description": (
+                "Fetch active humanitarian response plans for a country from "
+                "ReliefWeb (used to compare with Dispatcher recommendations)."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "country": {"type": "string", "description": "Country name"},
+                },
+                "required": ["country"],
             },
         },
     },

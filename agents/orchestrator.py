@@ -16,6 +16,7 @@ from models.gemma_client import GemmaClient
 from agents.event_detector import EventDetector, DetectedEvent
 from agents.impact_predictor import ImpactPredictor, CountryPrediction
 from agents.dispatcher import Dispatcher, ResponsePlan
+from agents.action_verifier import ActionVerifier, VerificationResult
 from agents.narrative_generator import NarrativeGenerator, NarrativeSet
 
 
@@ -26,6 +27,7 @@ class PipelineResult:
     cascade_impacts: list[CascadeImpact]
     prediction: CountryPrediction
     response_plan: ResponsePlan
+    verification: Optional[VerificationResult] = None
     narratives: Optional[NarrativeSet] = None
 
 
@@ -44,6 +46,7 @@ class Orchestrator:
         self.event_detector = EventDetector(self.client)
         self.impact_predictor = ImpactPredictor(self.client)
         self.dispatcher = Dispatcher(self.client)
+        self.action_verifier = ActionVerifier(self.client)
         self.narrative_generator = NarrativeGenerator(self.client)
 
     def run(
@@ -52,6 +55,7 @@ class Orchestrator:
         countries: Optional[list[str]] = None,
         audiences: Optional[list[str]] = None,
         skip_narratives: bool = False,
+        skip_verification: bool = False,
     ) -> MultiCountryResult:
         """Run the full CascadeAI pipeline for an event across countries."""
         if countries is None:
@@ -70,6 +74,7 @@ class Orchestrator:
             country_result = self._run_country(
                 event, country_name, event_description,
                 audiences=audiences, skip_narratives=skip_narratives,
+                skip_verification=skip_verification,
             )
             result.results[country_name] = country_result
 
@@ -101,6 +106,7 @@ class Orchestrator:
         event_description: str,
         audiences: Optional[list[str]] = None,
         skip_narratives: bool = False,
+        skip_verification: bool = False,
     ) -> PipelineResult:
         # Step 2: Cascade Analysis (deterministic BFS — no LLM)
         profile = load_profile(country_name)
@@ -135,7 +141,17 @@ class Orchestrator:
             event_summary=event_description,
         )
 
-        # Step 5: Narrative Generation (Gemma 4, optional)
+        # Step 5: Verify recommended actions against current affairs (Gemma 4 + live data)
+        verification = None
+        if not skip_verification:
+            verification = self.action_verifier.verify(
+                country=country_name,
+                response_plans=response_plan.response_plans,
+                region=event.region,
+                event_summary=event_description,
+            )
+
+        # Step 6: Narrative Generation (Gemma 4, optional)
         narratives = None
         if not skip_narratives:
             narratives = self.narrative_generator.generate(
@@ -151,5 +167,6 @@ class Orchestrator:
             cascade_impacts=cascade_impacts,
             prediction=prediction,
             response_plan=response_plan,
+            verification=verification,
             narratives=narratives,
         )
