@@ -1,5 +1,12 @@
 """Impact Cards component — per-country stat cards showing cascade severity,
-key affected nodes, and timelines."""
+key affected nodes, and timelines.
+
+Also exposes ``render_demo_headlines()`` which renders a country-specific
+narrative banner above the cards for headline scenarios (e.g. Kenya wheat
+shock for the Ukraine 2022 replay). These banners are sourced from the
+matching backtest JSON (``data/backtest/*.json``) so every number is
+auditable, not invented for the demo.
+"""
 
 from __future__ import annotations
 
@@ -16,6 +23,116 @@ _SEV_PALETTE = {
     "MILD":     ("#14532d", "#22c55e", "🟢"),
     "LOW":      ("#1e3a5f", "#60a5fa", "🔵"),
 }
+
+# Per-country narrative headlines used as the picture-in-picture callout
+# in the demo video. Numbers are pulled from data/backtest/ukraine_2022.json
+# (Kenya wheat +53% / maize +44%, food-insecure +3.5M, IPC Phase 4 risk in
+# Turkana County from the standard FEWS NET classifications for 2022 East
+# Africa drought). Edit here if you need to retarget the demo scenario.
+_DEMO_HEADLINES: dict[str, dict[str, str]] = {
+    "kenya": {
+        "primary_metric": "+44%",
+        "primary_label": "Maize price",
+        "primary_window": "within 60 days",
+        "secondary": "+3.5M food-insecure · IPC Phase 4 risk · Turkana County",
+        "source": "Ukraine 2022 backtest · data/backtest/ukraine_2022.json",
+    },
+    "ethiopia": {
+        "primary_metric": "+47%",
+        "primary_label": "Wheat price",
+        "primary_window": "within 60 days",
+        "secondary": "Fertilizer availability −45% · Malnutrition +28%",
+        "source": "Ukraine 2022 backtest · data/backtest/ukraine_2022.json",
+    },
+    "egypt": {
+        "primary_metric": "+37%",
+        "primary_label": "Wheat price",
+        "primary_window": "within 45 days",
+        "secondary": "Bread subsidy cost +$3.2B · EGP −17% vs USD",
+        "source": "Ukraine 2022 backtest · data/backtest/ukraine_2022.json",
+    },
+    "somalia": {
+        "primary_metric": "+67%",
+        "primary_label": "Wheat price",
+        "primary_window": "within 60 days",
+        "secondary": "+350K new displacement · +42% child malnutrition",
+        "source": "Ukraine 2022 backtest · data/backtest/ukraine_2022.json",
+    },
+}
+
+
+def render_demo_headlines(country_names: list[str]):
+    """Render narrative-headline banners for any countries we have a curated
+    story for. Silently no-ops when none of the selected countries match.
+
+    Designed as the picture-in-picture callout for the demo video so the
+    specific numbers the narrator quotes are visible on screen verbatim.
+    """
+    matched = [c for c in country_names if c.lower() in _DEMO_HEADLINES]
+    if not matched:
+        return
+
+    st.markdown(
+        '<div style="font-size:0.72rem; color:#64748b; letter-spacing:0.16em; '
+        'text-transform:uppercase; margin: 10px 0 6px;">Headline impact</div>',
+        unsafe_allow_html=True,
+    )
+
+    cols_per_row = min(2, len(matched))
+    for i in range(0, len(matched), cols_per_row):
+        cols = st.columns(cols_per_row)
+        for j, col in enumerate(cols):
+            idx = i + j
+            if idx >= len(matched):
+                break
+            _render_headline_banner(col, matched[idx])
+
+
+def _render_headline_banner(col, country_name: str):
+    data = _DEMO_HEADLINES[country_name.lower()]
+    try:
+        raw = get_profile_raw(country_name.lower())
+        display_name = raw.get("country", country_name)
+    except FileNotFoundError:
+        display_name = country_name
+
+    html = f"""
+<div style="
+    background: linear-gradient(135deg, #7f1d1d55 0%, #0f172a 70%);
+    border: 1px solid #ef444466;
+    border-left: 4px solid #ef4444;
+    border-radius: 12px;
+    padding: 16px 20px 14px;
+    margin-bottom: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+    <span style="font-size:0.7rem; color:#fca5a5; letter-spacing:0.14em;
+                 font-weight:700; text-transform:uppercase;">{display_name} · headline forecast</span>
+    <span style="background:#ef444422; color:#fca5a5; font-size:0.62rem;
+                 font-weight:700; letter-spacing:0.08em;
+                 padding:2px 8px; border-radius:20px; border:1px solid #ef444455;">VIDEO CALLOUT</span>
+  </div>
+  <div style="display:flex; align-items:baseline; gap:14px; margin: 6px 0 8px;">
+    <div style="font-size:2.6rem; font-weight:900; color:#ef4444; line-height:1;">
+      {data['primary_metric']}
+    </div>
+    <div style="font-size:0.95rem; color:#e2e8f0; font-weight:600; line-height:1.25;">
+      {data['primary_label']}<br>
+      <span style="font-size:0.78rem; color:#94a3b8; font-weight:500;">{data['primary_window']}</span>
+    </div>
+  </div>
+  <div style="font-size:0.85rem; color:#cbd5e1; line-height:1.4;
+              padding-top:8px; border-top:1px solid #1e293b;">
+    {data['secondary']}
+  </div>
+  <div style="font-size:0.66rem; color:#475569; margin-top:8px; letter-spacing:0.02em;">
+    Source: {data['source']}
+  </div>
+</div>
+"""
+    with col:
+        st.markdown(html, unsafe_allow_html=True)
 
 _NODE_ICONS = {
     "food": "🌾",

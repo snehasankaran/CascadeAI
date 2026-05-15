@@ -52,12 +52,14 @@ from cascade.traversal import run_cascade, run_compound_cascade, CascadeImpact
 from cascade.replay import run_backtest, available_scenarios
 from data.profiles import load_profile, load_all_profiles, available_countries, get_profile_raw
 from frontend.components.cascade_map import render_cascade_map
-from frontend.components.impact_cards import render_impact_cards
+from frontend.components.impact_cards import render_impact_cards, render_demo_headlines
 from frontend.components.backtest_view import render_backtest_view
+from frontend.components.backtest_overview import render_backtest_overview
 from frontend.components.audience_selector import render_audience_selector
 from frontend.components.predictions_view import render_predictions_view
 from frontend.components.action_watch import render_action_watch
 from frontend.components.vision_analyst_view import render_vision_analyst
+from frontend.components.intro_story import render_intro_story
 from data.predictions.loader import available_predictions, load_prediction
 
 
@@ -743,6 +745,7 @@ with st.sidebar:
     mode = st.radio(
         "Mode",
         [
+            "📖 The Story",
             "Crisis Simulator",
             "Backtest Validation",
             "Forward Predictions",
@@ -750,11 +753,16 @@ with st.sidebar:
             "Event Detector (Gemma 4)",
             "Vision Analyst (Gemma 4 Multimodal)",
         ],
-        index=0,
+        index=1,
     )
     st.divider()
 
-    if mode == "Crisis Simulator":
+    if mode == "📖 The Story":
+        st.subheader("The 120-Day Gap")
+        st.caption("Why CascadeAI exists · the scene every humanitarian agency knows by heart")
+        run_btn = False
+
+    elif mode == "Crisis Simulator":
         st.subheader("Event Configuration")
         event_node = st.selectbox(
             "Crisis Type",
@@ -864,7 +872,10 @@ st.markdown(
 st.divider()
 
 
-if mode == "Crisis Simulator":
+if mode == "📖 The Story":
+    render_intro_story()
+
+elif mode == "Crisis Simulator":
     if run_btn and not selected_countries:
         st.warning("Select at least one country in the sidebar to run the cascade.")
         st.session_state.pop("sim_impacts", None)
@@ -890,6 +901,7 @@ if mode == "Crisis Simulator":
             render_cascade_map(all_impacts, graph)
 
         with tab_cards:
+            render_demo_headlines(sim_countries)
             render_impact_cards(all_impacts, graph)
 
         with tab_table:
@@ -929,6 +941,9 @@ if mode == "Crisis Simulator":
         _show_welcome()
 
 elif mode == "Backtest Validation":
+    render_backtest_overview()
+    st.divider()
+
     if run_btn:
         with st.spinner("Running backtest..."):
             results = run_backtest(scenario)
@@ -938,7 +953,7 @@ elif mode == "Backtest Validation":
     if st.session_state.get("backtest_results"):
         render_backtest_view(st.session_state["backtest_results"])
     else:
-        st.info("Select a backtest scenario and click **Run Backtest** to validate CascadeAI against real historical data.")
+        st.info("Select a backtest scenario above and click **Run Backtest** in the sidebar to drill into per-country predictions vs actuals.")
 
 elif mode == "Forward Predictions":
     if run_btn:
@@ -1066,6 +1081,7 @@ elif mode == "Event Detector (Gemma 4)":
         with tab_map:
             render_cascade_map(all_impacts, graph)
         with tab_cards:
+            render_demo_headlines(saved_countries)
             render_impact_cards(all_impacts, graph)
         with tab_table:
             _render_detail_table(all_impacts, graph)
