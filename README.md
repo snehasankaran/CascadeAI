@@ -33,10 +33,8 @@ CascadeAI closes the **120-day gap** between when a humanitarian crisis starts c
 
 > **Headline result:** 38 of 39 retrospective forecasts landed within their predefined scenario ranges across 4 historical crises and 13 countries (**97.4% within-range performance** using only data that existed on Day One of each crisis).
 
-<!-- TODO: After deploying to Streamlit Cloud, save a screenshot of the Crisis Simulator
-     (running Ukraine 2022 or Hormuz, with cascade map + 2-3 impact cards visible)
-     to docs/dashboard.png and uncomment the line below. -->
-<!-- ![CascadeAI dashboard — Crisis Simulator](docs/dashboard.png) -->
+![CascadeAI dashboard — Ukraine 2022 cascade across Kenya, Ethiopia, Somalia, Egypt](docs/dashboard_hero.png)
+*Crisis Simulator: a Ukraine-2022 trigger walked through the deterministic BFS, with per-country impact severity rendered as Impact Cards.*
 
 ## Why CascadeAI
 
@@ -89,6 +87,9 @@ That is the whole judging story. No setup beyond a Gemma 4 key.
 
 Most crisis tools tell you **what's happening**. CascadeAI tells you **what's not being addressed**.
 
+![Action Watch — live ReliefWeb verification with 3 critical blind spots flagged](docs/action_watch.png)
+*Action Watch verifying Kenya recommendations against live ReliefWeb + ACLED feeds. 38% of recommended actions are already in progress; 3 are **critical blind spots** with no active humanitarian response detected.*
+
 The **Action Verifier agent** ([`agents/action_verifier.py`](agents/action_verifier.py)) runs a multi-turn agentic loop on Gemma 4's native function-calling protocol — `apply_chat_template(tools=[...])` for Hugging Face / Ollama; `functionDeclarations` for Google AI Studio. Gemma 4 autonomously decides which of these tools to call:
 
 - `search_reliefweb_reports(country=…)` → real-time humanitarian situation reports
@@ -111,6 +112,9 @@ A green `LIVE · NATIVE TOOL CALLS` badge on the dashboard tells you exactly whi
 ## The headline credibility: 38/39 retrospective forecasts within range
 
 CascadeAI was backtested against 4 historical crises by **replaying each scenario using only data that existed on Day One** of the event — no peeking, no fine-tuning on the outcome. Each prediction had a *predefined* numeric range (e.g., *"Kenya wheat +35–55% in 60 days"*) and was scored as within-range or miss.
+
+![Backtest Validation — Ukraine 2022 replay, 13/13 predictions within range across 4 countries](docs/backtest_ukraine_2022.png)
+*Ukraine 2022 backtest: 13 of 13 predictions across Kenya, Ethiopia, Egypt, Somalia landed within their pre-registered ranges. Live wheat-price forecast (+40–55% in 60 days) vs. actual peak (+53% in May 2022) shown in the first row.*
 
 | Scenario | Trigger | Countries | Predictions within range |
 |---|---|---|---|
@@ -270,6 +274,10 @@ The Narrative Generator ([`agents/narrative_generator.py`](agents/narrative_gene
 **Languages:** English · Swahili · Bengali · Hindi · Arabic · Amharic · French · Portuguese · Indonesian · Spanish · Turkish
 
 One model, one prompt, eleven languages. This is the difference between an institution-only tool and one that reaches a mother in Turkana before food prices move.
+
+| Same crisis · Field-worker voice · Swahili | Same crisis · Policy-brief voice · English |
+|---|---|
+| ![Swahili field-worker alert](docs/narratives_swahili.png) | ![English policy brief for the Cabinet Secretary](docs/narratives_policy_brief.png) |
 
 ---
 
