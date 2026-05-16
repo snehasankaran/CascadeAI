@@ -46,14 +46,24 @@ _ORIGIN = {"lat": 46.5, "lon": 30.7}
 # =============================================================================
 
 def render_intro_story():
-    """Render the full 120-day gap opening sequence."""
+    """Render the full 120-day gap opening sequence plus the Mary persona
+    + fragmentation problem (Scene 2 of the demo video)."""
     _inject_animations()
+
+    # Scene 1 · The 120-day gap
     _render_title_card()
     _render_wheat_chart()
     _render_cascade_map()
     _render_timeline_bar()
     _render_120_reveal()
     _render_close_caption()
+
+    # Scene 2 · Meet Mary + the fragmentation problem
+    _render_scene_2_divider()
+    _render_mary_persona_card()
+    _render_decision_stakes()
+    _render_fragmentation_grid()
+    _render_built_for_mary()
 
 
 # =============================================================================
@@ -374,6 +384,210 @@ def _render_close_caption():
 ">
   <span style="color:#a78bfa; font-weight:700;">CascadeAI</span>
   turns 120 days of reaction into 48 hours of preparation.
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# =============================================================================
+# Scene 2 · Meet Mary + the fragmentation problem
+# =============================================================================
+# Designed to be screen-recorded as a continuous scroll-down from the
+# "120" reveal. Mirrors Scene 1's pure-dashboard recording technique: no
+# stock footage, no on-camera human, no Canva overlay — every pixel in
+# the video comes from this Streamlit page.
+
+def _render_scene_2_divider():
+    """Visual section break between Scene 1 (the gap) and Scene 2 (the user)."""
+    st.markdown(
+        """
+<div style="margin: 36px 0 12px; padding: 16px 0 0;
+            border-top: 1px solid #1e293b; text-align: center;">
+  <div style="display:inline-block; background:#0f172a; padding: 0 18px;
+              transform: translateY(-30px);
+              font-size: 0.72rem; color: #64748b; letter-spacing: 0.22em;
+              text-transform: uppercase; font-weight: 700;">
+    Scene 2 · The user
+  </div>
+  <div style="font-size: 2.2rem; font-weight: 800; color: #e2e8f0;
+              margin-top: -6px; line-height: 1.2;">
+    Now picture one person inside that 120-day gap.
+  </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _render_mary_persona_card():
+    """Persona identity card. NO AI-generated face — uses a clean monogram
+    avatar to keep the credibility story intact."""
+    st.markdown(
+        """
+<div class="story-fade-1" style="
+    margin: 8px auto 24px;
+    max-width: 720px;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.10) 0%, rgba(15,23,42,0) 70%);
+    border: 1px solid #334155;
+    border-left: 4px solid #a78bfa;
+    border-radius: 14px;
+">
+  <div style="
+      flex-shrink: 0;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6 0%, #60a5fa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(139,92,246,0.25);
+      letter-spacing: -0.02em;
+  ">MW</div>
+  <div style="flex: 1;">
+    <div style="font-size: 1.5rem; font-weight: 800; color: #e2e8f0; line-height: 1.1;">
+      Mary Wanjiku
+    </div>
+    <div style="font-size: 0.95rem; color: #cbd5e1; margin-top: 4px; line-height: 1.35;">
+      Senior Programme Officer · Humanitarian agency · Nairobi, Kenya
+    </div>
+    <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 8px;
+                padding-top: 8px; border-top: 1px solid #1e293b;
+                font-style: italic;">
+      Composite persona based on field interviews with humanitarian agency staff.
+    </div>
+  </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _render_decision_stakes():
+    """The 48-hour Hormuz decision panel — sets the stakes for the cascade."""
+    st.markdown(
+        """
+<div class="story-fade-2" style="
+    margin: 8px auto 28px;
+    max-width: 720px;
+    padding: 18px 24px;
+    background: linear-gradient(90deg, rgba(127,29,29,0.18) 0%, rgba(15,23,42,0.6) 100%);
+    border: 1px solid #ef444466;
+    border-left: 4px solid #ef4444;
+    border-radius: 12px;
+">
+  <div style="font-size: 0.68rem; color: #fca5a5; letter-spacing: 0.18em;
+              text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">
+    March 2026 · 48-hour decision window
+  </div>
+  <div style="font-size: 1.05rem; color: #e2e8f0; line-height: 1.5;">
+    Shipping through Hormuz has just been disrupted. Mary has
+    <span style="color:#ef4444; font-weight:700;">48 hours</span> to decide
+    whether her organisation pre-positions <span style="color:#ef4444; font-weight:700;">60,000 tonnes
+    of wheat</span> at Mombasa port — before East African market prices begin to move.
+  </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _render_fragmentation_grid():
+    """3 × 3 grid of nine real humanitarian agencies whose data Mary has
+    to consult today. The whole point is to look overwhelming."""
+    st.markdown(
+        '<div style="text-align: center; margin: 12px 0 6px;">'
+        '<div style="font-size: 0.72rem; color: #64748b; letter-spacing: 0.18em; '
+        'text-transform: uppercase; font-weight: 700;">The data she needs · scattered</div>'
+        '<div style="font-size: 1.5rem; font-weight: 700; color: #e2e8f0; margin-top: 2px;">'
+        'Nine agencies. Twelve dashboards. Zero time.</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    agencies = [
+        # (name, data spine, accent, tilt)
+        ("WFP HungerMap LIVE",   "Live food insecurity",         "#22c55e",  -1.2),
+        ("ReliefWeb",            "Situation reports · OCHA",     "#60a5fa",   0.8),
+        ("FEWS NET",             "Early warning · USAID/USGS",   "#f59e0b",  -0.5),
+        ("ACLED",                "Conflict events · live",       "#ef4444",   1.4),
+        ("OCHA HDX",             "Humanitarian datasets",         "#a78bfa",  -1.0),
+        ("UNHCR Data Portal",    "Refugee flows · displacement", "#06b6d4",   0.6),
+        ("FAO GIEWS",            "Food supply · trade",          "#84cc16",  -1.3),
+        ("WHO Africa",           "Health surveillance",          "#ec4899",   0.9),
+        ("IPC Food Insecurity",  "Phase classification",         "#f97316",  -0.7),
+    ]
+
+    cards_html = ""
+    for name, data_spine, accent, tilt in agencies:
+        cards_html += f"""
+<div style="
+    background: linear-gradient(160deg, rgba(15,23,42,0.95) 0%, #0b1426 100%);
+    border: 1px solid #1e293b;
+    border-top: 3px solid {accent};
+    border-radius: 10px;
+    padding: 12px 14px;
+    transform: rotate({tilt}deg);
+    transition: transform 0.3s ease;
+    min-height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+">
+  <div>
+    <div style="font-size: 0.82rem; font-weight: 700; color: #e2e8f0; line-height: 1.2;">
+      {name}
+    </div>
+    <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px; line-height: 1.3;">
+      {data_spine}
+    </div>
+  </div>
+  <div style="font-size: 0.62rem; color: {accent}; letter-spacing: 0.10em;
+              text-transform: uppercase; font-weight: 700; margin-top: 8px;">
+    ↗ separate portal
+  </div>
+</div>
+"""
+    grid_html = f"""
+<div style="
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 820px;
+    margin: 12px auto 24px;
+    padding: 8px;
+">
+{cards_html}
+</div>
+"""
+    st.markdown(grid_html, unsafe_allow_html=True)
+
+
+def _render_built_for_mary():
+    """Closing line of Scene 2 — the emotional pivot that bridges into
+    Scene 3 (the unified CascadeAI dashboard)."""
+    st.markdown(
+        """
+<div style="
+    text-align: center;
+    padding: 28px 24px 48px;
+    font-size: 1.5rem;
+    color: #e2e8f0;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 700px;
+    margin: 0 auto;
+">
+  <span style="color: #a78bfa; font-weight: 800;">CascadeAI</span>
+  is built for Mary.
 </div>
         """,
         unsafe_allow_html=True,
