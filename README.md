@@ -23,7 +23,7 @@ tags:
 > **Predicting how a single crisis cascades across energy · food · health · displacement — powered by Gemma 4.**
 
 [![Live demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit&logoColor=white)](https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app/)
-[![Video](https://img.shields.io/badge/Video-3%20min%20demo-red?logo=youtube)](<YOUTUBE_URL>)
+[![Video](https://img.shields.io/badge/Video-3%20min%20demo-red?logo=youtube)](https://www.youtube.com/watch?v=n1ubwIsnSjk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Gemma 4](https://img.shields.io/badge/Powered%20by-Gemma%204-8b5cf6)](https://ai.google.dev/gemma)
 
