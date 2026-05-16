@@ -2,11 +2,7 @@
 
 ## Closing the 120-day gap between when a crisis starts cascading and when the world responds.
 
-<<<<<<< HEAD
-**Track:** Global Resilience (+ Ollama Special Track) · **Powered by:** Gemma 4 · **Repo:** https://github.com/snehasankaran/CascadeAI · **Live demo:** https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app · **Video:** https://youtu.be/n1ubwIsnSjk?si=Mc_pbvdLPcWUgQW1
-=======
 **Track:** Global Resilience (+ Ollama Special Track) · **Powered by:** Gemma 4 · **Repo:** https://github.com/snehasankaran/CascadeAI · **Live demo:** https://cascadeai-cvpptq4nakg5kg8jtepf6v.streamlit.app · **Video:** https://www.youtube.com/watch?v=n1ubwIsnSjk
->>>>>>> cdb7766 (Add YouTube demo link to README and writeup docs.)
 
 ---
 
